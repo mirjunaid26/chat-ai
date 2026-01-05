@@ -267,6 +267,10 @@ export default {
     top_p:
       "top_p ist ein Schieberegler von 0 bis 1, der den Gesamtbestand der Wahrscheinlichkeiten anpasst, die für das nächste Token in Betracht gezogen werden. Ein top_p von 0,1 würde bedeuten, dass nur die oberen 10% der kumulativen Wahrscheinlichkeiten berücksichtigt werden. Die Variation von top_p hat einen ähnlichen Effekt auf Vorhersagbarkeit und Kreativität wie die Temperatur.",
   },
+  model_selector: {
+    docs_hint_text: "Unsicher, welches Modell Sie wählen sollen?",
+    docs_hint_link: "Lesen Sie den Modellüberblick.",
+  },
   // Tour
   tour: {
     welcome_message: "Willkommen bei Chat AI",

@@ -268,6 +268,10 @@ export default {
     top_p:
       "top_p is a slider from 0 to 1 which adjusts the total population of probabilities considered for the next token. A top_p of 0.1 would mean only the top 10% of cumulative probabilities is considered. Variating top_p has a similar effect on predictability and creativity as temperature.",
   },
+  model_selector: {
+    docs_hint_text: "Need help deciding which model fits best?",
+    docs_hint_link: "Read the model overview.",
+  },
   // Tour
   tour: {
     welcome_message: "Welcome to Chat AI",

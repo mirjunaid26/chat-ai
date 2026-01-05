@@ -3,6 +3,7 @@ import {
   faArrowUpAZ,
   faBookOpen,
   faBrain,
+  faCircleInfo,
   faChevronDown,
   faImage,
   faMagnifyingGlass,
@@ -12,6 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { BaseModelInfo } from "../../types/models";
 import Tooltip from "../Others/Tooltip";
 import DemandIndicator from "./DemandIndicator";
@@ -23,6 +25,8 @@ const sortOptions = [
 
 export default function ModelSelectorSimple({ selectedModel, modelsData, onChange, inHeader = false }: { selectedModel: BaseModelInfo | null, modelsData: BaseModelInfo[], inHeader: boolean, onChange: (model: BaseModelInfo) => void }) {
   
+  const { t } = useTranslation();
+
   function setSelectedModel(model: BaseModelInfo | null) {
     onChange && onChange(model);
   }
@@ -134,6 +138,22 @@ export default function ModelSelectorSimple({ selectedModel, modelsData, onChang
       {/** Dropdown Panel **/}
       <div className={`${dropdownOpen ? "" : "hidden"} ${inHeader ? "fixed left-0 top-12 w-screen" : "absolute"} bg-white dark:bg-bg_secondary_dark z-50 mt-1 w-full rounded-2xl border border-slate-200 dark:border-gray-500  shadow-2xl dark:shadow-dark pb-4`}>
 
+        <div className="px-3 pt-3 pb-2">
+          <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs text-slate-600 dark:text-slate-200">
+            <FontAwesomeIcon icon={faCircleInfo} className="text-tertiary" />
+            <span>
+              {t("model_selector.docs_hint_text")}{" "}
+              <a
+                className="text-tertiary underline font-medium"
+                href="https://docs.hpc.gwdg.de/services/chat-ai/models/index.html"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                {t("model_selector.docs_hint_link")}
+              </a>
+            </span>
+          </div>
+        </div>
         {/** Controls **/}
         <div className={`text-sm flex items-center gap-2 p-2 border-b border-slate-100 dark:border-gray-500 to-white`}>
           <div className="relative flex-1">
