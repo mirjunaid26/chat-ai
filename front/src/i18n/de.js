@@ -322,6 +322,9 @@ export default {
     data_security_notice: "Ihre Daten werden sicher innerhalb unserer Server verarbeitet. Es werden keine Informationen außerhalb der GWDG übertragen.",
     arcana_usage:
       "Halten Sie Temperatur auf 0 und top_p auf 0.05 für optimale Arcana-Ergebnisse",
+    arcana_create_collection_prefix:
+      "Erstellen Sie Ihre eigene Dokumentensammlung",
+    arcana_create_collection_link: "hier",
     web_search_usage:
       "PRIVACY WARNUNG: Ihr Verlauf kann an eine Suchmaschine (z. B. Google) gesendet werden",
     mcp_usage:

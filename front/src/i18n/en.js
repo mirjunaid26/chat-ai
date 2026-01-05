@@ -324,6 +324,9 @@ export default {
       "You are using an external model or external features. Your messages will be processed outside of GWDG, and your custom settings will not be applied. Please refrain from entering confidential or personal data. External models can only be used by scientific employees for scientific work, provided that no personal data is entered.",
     arcana_usage:
       "Keep temperature at 0 and top_p at 0.05 for optimal arcana results",
+    arcana_create_collection_prefix:
+      "Create your own Document Collection",
+    arcana_create_collection_link: "here",
     web_search_usage:
       "PRIVACY WARNING: Your chat history may be sent to a search engine (e.g., Google)",
     mcp_usage: "PRIVACY WARNING: Your data may be sent to external servers.",
