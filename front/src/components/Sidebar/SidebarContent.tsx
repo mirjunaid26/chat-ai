@@ -272,8 +272,10 @@ export default function SidebarContent({
             : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/40"
         } ${isDropTarget ? "border-tertiary/60 bg-tertiary/5 dark:bg-tertiary/20" : ""}`}
       >
-        <div className="flex-1 flex items-center justify-between text-left select-none pointer-events-none">
-          <span className="truncate">{option.label}</span>
+        <div className="flex-1 flex items-center justify-between text-left select-none pointer-events-none min-w-0">
+          <span className="truncate" title={option.label}>
+            {option.label}
+          </span>
           <span className="ml-2 text-[11px] font-semibold text-gray-500 dark:text-gray-200">
             {displayCount}
           </span>
