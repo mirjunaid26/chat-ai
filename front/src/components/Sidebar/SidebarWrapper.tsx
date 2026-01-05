@@ -45,6 +45,20 @@ export default function SidebarWrapper({ localState, setLocalState, userData, mo
   }, [userSettings, navigate, focusPromptInput]);
 
   useEffect(() => {
+    let shortcutLocked = false;
+    let unlockTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const startCooldown = () => {
+      shortcutLocked = true;
+      if (unlockTimer) {
+        clearTimeout(unlockTimer);
+      }
+      unlockTimer = setTimeout(() => {
+        shortcutLocked = false;
+        unlockTimer = null;
+      }, 800);
+    };
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!(event.ctrlKey || event.metaKey) || !event.shiftKey) {
         return;
@@ -54,7 +68,12 @@ export default function SidebarWrapper({ localState, setLocalState, userData, mo
         return;
       }
 
+      if (event.repeat || shortcutLocked) {
+        return;
+      }
+
       event.preventDefault();
+      startCooldown();
 
       handleNewConversation().catch((error) => {
         console.error("Failed to start new conversation from shortcut", error);
@@ -65,6 +84,9 @@ export default function SidebarWrapper({ localState, setLocalState, userData, mo
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      if (unlockTimer) {
+        clearTimeout(unlockTimer);
+      }
     };
   }, [handleNewConversation]);
 
