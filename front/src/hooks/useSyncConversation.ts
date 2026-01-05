@@ -179,7 +179,7 @@ export function useSyncConversation({
   const timeoutIds = useRef({});
   const lastModified = useRef({});
   const delay = 600;
-  const latestStateRef = useRef(localState);
+  const latestStateRef = useRef<Record<string, any>>({});
   const saveInFlight = useRef(false);
   const needsRetry = useRef(false);
 
@@ -238,7 +238,9 @@ export function useSyncConversation({
 
   // Effect 2: Debounced auto-save into IndexedDB
   useEffect(() => {
-    latestStateRef.current = localState;
+    if (localState?.id) {
+      latestStateRef.current[localState.id] = localState;
+    }
     if(!initialized) {
       if (localState?.id === conversationId) {
         setInitialized(true); // Initialized for next change
@@ -266,7 +268,14 @@ export function useSyncConversation({
       saveInFlight.current = true;
       needsRetry.current = false;
 
-      const snapshot = { ...latestStateRef.current };
+      const stateForConversation = latestStateRef.current[currentConversation];
+      if (!stateForConversation) {
+        console.warn("No snapshot found for conversation", currentConversation);
+        saveInFlight.current = false;
+        delete timeoutIds.current[currentConversation];
+        return;
+      }
+      const snapshot = { ...stateForConversation };
       let ignoreConflict = false;
       if (snapshot?.ignoreConflict) {
         ignoreConflict = true;
