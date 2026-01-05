@@ -269,7 +269,7 @@ export default {
   },
   model_selector: {
     docs_hint_text: "Unsicher, welches Modell Sie wählen sollen?",
-    docs_hint_link: "Lesen Sie den Modellüberblick.",
+    docs_hint_link: "Lesen Sie die Modellübersicht.",
   },
   // Tour
   tour: {
