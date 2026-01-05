@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { DragEvent } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
@@ -12,7 +13,7 @@ import {
   MoreVertical,
   Trash2,
 } from "lucide-react";
-import { useConversationList, useFolderList } from "../../db";
+import { assignConversationToFolder, useConversationList, useFolderList } from "../../db";
 import { useModal } from "../../modals/ModalContext";
 
 import { toggleSidebar } from "../../Redux/reducers/interfaceSettingsSlice";
@@ -22,6 +23,7 @@ import { useWindowSize } from "../../hooks/useWindowSize";
 import ImportConversationButton from "./ImportConversationButton";
 import AiServicesMenu from "./AiServicesMenu";
 import ShortcutTooltip from "./ShortcutTooltip";
+import { useToast } from "../../hooks/useToast";
 
 const ALL_FOLDERS = "__all__";
 
@@ -38,6 +40,7 @@ export default function SidebarContent({
   const dispatch = useDispatch();
   const { openModal } = useModal();
   const { t } = useTranslation();
+  const { notifyError } = useToast();
   const currentConversationId = localState?.id;
 
   const { isDesktop, isTouch } = useWindowSize();
@@ -53,6 +56,8 @@ export default function SidebarContent({
     currentConversationId
   );
   const [hoveredId, setHoveredId] = useState(null);
+  const [draggingConversationId, setDraggingConversationId] = useState<string | null>(null);
+  const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (localState?.id) {
@@ -105,6 +110,54 @@ export default function SidebarContent({
   }, [filteredByFolder, hasSearch, normalizedSearch, t]);
 
   const noSearchResults = hasSearch && visibleConversations.length === 0;
+
+  const handleConversationDragStart = useCallback(
+    (event: DragEvent<HTMLDivElement>, conversationId: string) => {
+      event.dataTransfer?.setData("text/plain", conversationId);
+      event.dataTransfer.effectAllowed = "move";
+      setDraggingConversationId(conversationId);
+      setDragOverFolderId(null);
+    },
+    []
+  );
+
+  const handleConversationDragEnd = useCallback(() => {
+    setDraggingConversationId(null);
+    setDragOverFolderId(null);
+  }, []);
+
+  const handleFolderDrop = useCallback(
+    async (targetId: string) => {
+      if (!draggingConversationId) return;
+
+      const conversation = conversations.find(
+        (conv) => conv.id === draggingConversationId
+      );
+      if (!conversation) {
+        setDraggingConversationId(null);
+        setDragOverFolderId(null);
+        return;
+      }
+
+      const nextFolderId = targetId === ALL_FOLDERS ? null : targetId;
+      if ((conversation.folderId ?? null) === nextFolderId) {
+        setDraggingConversationId(null);
+        setDragOverFolderId(null);
+        return;
+      }
+
+      try {
+        await assignConversationToFolder(draggingConversationId, nextFolderId);
+      } catch (error) {
+        console.error("Failed to move conversation via drag & drop", error);
+        notifyError(t("folders.error_generic"));
+      } finally {
+        setDraggingConversationId(null);
+        setDragOverFolderId(null);
+      }
+    },
+    [conversations, draggingConversationId, notifyError, t]
+  );
 
   function onClose() {
     dispatch(toggleSidebar());
@@ -180,6 +233,7 @@ export default function SidebarContent({
     const isActive = activeFolderId === option.id;
     const rawCount = folderCounts.get(option.countKey) ?? 0;
     const displayCount = rawCount > 99 ? "99+" : rawCount;
+    const isDropTarget = draggingConversationId !== null && dragOverFolderId === option.id;
     return (
       <div
         key={option.id}
@@ -192,11 +246,31 @@ export default function SidebarContent({
             handleFolderSelection(option.id);
           }
         }}
-        className={`group flex items-center gap-2 rounded-2xl px-3 py-2 text-xs transition cursor-pointer ${
+        onDragEnter={(e) => {
+          if (!draggingConversationId) return;
+          e.preventDefault();
+          setDragOverFolderId(option.id);
+        }}
+        onDragOver={(e) => {
+          if (!draggingConversationId) return;
+          e.preventDefault();
+        }}
+        onDragLeave={(e) => {
+          if (!draggingConversationId) return;
+          if (dragOverFolderId === option.id) {
+            setDragOverFolderId(null);
+          }
+        }}
+        onDrop={(e) => {
+          if (!draggingConversationId) return;
+          e.preventDefault();
+          handleFolderDrop(option.id);
+        }}
+        className={`group flex items-center gap-2 rounded-2xl px-3 py-2 text-xs transition cursor-pointer border border-transparent ${
           isActive
             ? "bg-gray-100 dark:bg-gray-800 text-black dark:text-white shadow-sm"
             : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/40"
-        }`}
+        } ${isDropTarget ? "border-tertiary/60 bg-tertiary/5 dark:bg-tertiary/20" : ""}`}
       >
         <div className="flex-1 flex items-center justify-between text-left select-none pointer-events-none">
           <span className="truncate">{option.label}</span>
@@ -379,244 +453,197 @@ export default function SidebarContent({
         </ShortcutTooltip>
       </div>
 
-      {/* New Chat Button */}
-      <div className="flex-shrink-0 m-3 border-b border-gray-100 dark:border-gray-800 pb-3">
-        <button
-          onClick={onNewConversation}
-          className={`cursor-pointer w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 text-black dark:text-white px-4 py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-medium touch-manipulation transition-colors`}
-          style={{
-            WebkitTapHighlightColor: "transparent",
-            minHeight: "44px",
-          }}
-        >
-          <svg
-            className="h-4 w-4 flex-shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          <span className="truncate">
-            <Trans i18nKey="sidebar.new_conversation" />
-          </span>
-        </button>
-      </div>
-
-      {/* Folder Filters */}
-      <div className="flex flex-col gap-3 mx-3 pb-3 border-b border-gray-100 dark:border-gray-800">
-        <div className="flex flex-col gap-1">
-          <label className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            <Trans i18nKey="folders.search_label" />
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="none"
-              spellCheck={false}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t("folders.search_placeholder")}
-              className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 px-3 py-2 text-xs text-black dark:text-white pr-7 focus:outline-none focus:ring-2 focus:ring-tertiary/40"
-            />
-            {searchQuery.length > 0 && (
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-                aria-label={t("folders.clear_search")}
-                onClick={() => setSearchQuery("")}
-              >
-                ×
-              </button>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          <span>{t("folders.title")}</span>
-          <button
-            type="button"
-            onClick={handleCreateFolder}
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition"
-            aria-label={t("folders.create_button")}
-          >
-            <FolderPlus className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="flex flex-col gap-1">
-          {renderFolderRow({
-            id: ALL_FOLDERS,
-            label: t("folders.all"),
-            countKey: ALL_FOLDERS,
-          })}
-          {folders.map((folder) =>
-            renderFolderRow({
-              id: folder.id,
-              label: folder.name,
-              countKey: folder.id,
-              canEdit: true,
-              folder,
-            })
-          )}
-        </div>
-      </div>
-
-      {/* Conversations List */}
-      <div
-        className="flex-1 mx-3 overflow-hidden h-full overflow-y-auto overscroll-behavior-contain space-y-1 pb-3"
-        style={{
-          WebkitOverflowScrolling: "touch",
-        }}
-      >
-        {noSearchResults && (
-          <div className="text-center text-xs text-gray-500 dark:text-gray-400 py-4">
-            <Trans i18nKey="folders.search_no_results" values={{ query: searchQuery }} />
-          </div>
-        )}
-        {visibleConversations.map((conv) => {
-          const id = conv.id;
-          if (!conv) return null;
-          const isActive = id === selectedConversationId;
-          const isHovered = hoveredId === id;
-          const isMenuOpen = activeMenu === id;
-
-          return (
-            <div
-              key={id}
-              onClick={() => handleSelectConversation(id)}
-              className={`group relative px-3 py-3 rounded-2xl touch-manipulation ${
-                isActive
-                  ? "bg-gray-100 dark:bg-gray-800 text-black dark:text-white shadow-sm"
-                  : "text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-100"
-              }`}
-              data-current={isActive ? "true" : "false"}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="sticky top-0 z-20 bg-white dark:bg-bg_secondary_dark shadow-[0_2px_6px_rgba(15,23,42,0.08)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.5)]">
+          <div className="px-3 pt-3 pb-3 border-b border-gray-100 dark:border-gray-800 space-y-3">
+            <button
+              onClick={onNewConversation}
+              className={`cursor-pointer w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 text-black dark:text-white px-4 py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-medium touch-manipulation transition-colors`}
               style={{
                 WebkitTapHighlightColor: "transparent",
-                minHeight: "52px",
+                minHeight: "44px",
               }}
             >
-              {/* Title container */}
-              <div className="flex items-center h-full w-full group">
-                <div
-                  className="flex-1 overflow-hidden min-w-0"
-                  title={conv.title || "Untitled Conversation"}
-                  onDoubleClick={(e) => handleTitleDoubleClick(e, conv)}
-                  style={{ cursor: isDesktop ? "text" : "pointer" }}
-                >
-                  <div className="truncate text-xs font-medium leading-relaxed cursor-pointer">
-                    {highlightText(conv.title)}
-                  </div>
-                  {/* Removed folder label under "All chats" */}
-                </div>
+              <svg
+                className="h-4 w-4 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              <span className="truncate">
+                <Trans i18nKey="sidebar.new_conversation" />
+              </span>
+            </button>
 
-                {/* Action buttons 
-                <div
-                  className={`
-                    flex items-center gap-1 
-                    
-                    transition-opacity duration-200 
-                    ${window.innerWidth < 1024 || isHovered || isTouch ? "opacity-100" : "opacity-0"
-                    } group-hover:opacity-100`}
-                >
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <Trans i18nKey="folders.search_label" />
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t("folders.search_placeholder")}
+                  className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 px-3 py-2 text-xs text-black dark:text-white pr-7 focus:outline-none focus:ring-2 focus:ring-tertiary/40"
+                />
+                {searchQuery.length > 0 && (
                   <button
-                    onClick={(e) => {
-                      if (lockConversation) return;
-                      e.stopPropagation();
-                      openModal("renameConversation", {
-                        id,
-                        currentTitle: conv.title || "Untitled Conversation",
-                      });
-                    }}
-                    disabled={lockConversation}
-                    className={`p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 touch-manipulation flex items-center justify-center ${lockConversation
-                      ? "cursor-not-allowed opacity-50"
-                      : "hover:scale-110 active:scale-95 cursor-pointer"
-                      }`}
-                    style={{
-                      WebkitTapHighlightColor: "transparent",
-                    }}
-                    title="Edit conversation"
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                    aria-label={t("folders.clear_search")}
+                    onClick={() => setSearchQuery("")}
                   >
-                    <Edit className="w-3 h-3 text-[#009EE0]" alt="edit" />
+                    ×
                   </button>
-                  <button
-                    onClick={(e) => {
-                      if (lockConversation) return;
-                      e.stopPropagation();
-                      openModal("deleteConversation", {
-                        id,
-                        conversations,
-                        currentConversationId: localState?.id,
-                      });
-                    }}
-                    disabled={lockConversation}
-                    className={`p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-all duration-200 touch-manipulation flex items-center justify-center ${lockConversation
-                      ? "cursor-not-allowed opacity-50"
-                      : "hover:scale-110 active:scale-95 cursor-pointer"
-                      }`}
-                    style={{
-                      WebkitTapHighlightColor: "transparent",
-                    }}
-                    title="Delete conversation"
-                  >
-                    <X className="h-3.5 w-3.5 text-[#009EE0]" alt="cross" />
-                  </button>
-                </div>*/}
-                {/* Dropdown Menu Button */}
-                <div
-                  className={`transition-opacity duration-200 ${
-                    window.innerWidth < 1024 ||
-                    isHovered ||
-                    isActive ||
-                    isMenuOpen
-                      ? "opacity-100"
-                      : "opacity-0"
-                  } group-hover:opacity-100`}
-                >
-                  <button
-                    ref={(el) => (menuButtonRefs.current[id] = el)}
-                    onClick={(e) => openMenu(e, id)}
-                    className={`p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 touch-manipulation flex items-center justify-center 
-                      hover:scale-110 active:scale-95 cursor-pointer`}
-                    style={{
-                      WebkitTapHighlightColor: "transparent",
-                    }}
-                  >
-                    <MoreVertical className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                  </button>
-                </div>
+                )}
               </div>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        </div>
 
-      {/* Bottom section */}
-      <div className="flex flex-col gap-4 m-3 border-t border-gray-200 dark:border-gray-500 pt-3">
-        {/* Import Conversation button */}
-        <ImportConversationButton variant="button" />
-        {/* Import Persona button */}
-        <button
-          onClick={() => {
-            openModal("importPersona");
-          }}
-          className={`cursor-pointer w-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 text-black dark:text-white px-4 py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-medium touch-manipulation transition-colors`}
-          style={{
-            WebkitTapHighlightColor: "transparent",
-            minHeight: "44px",
-          }}
+        <div
+          className="flex-1 overflow-y-auto overflow-x-hidden"
+          style={{ WebkitOverflowScrolling: "touch" }}
         >
-          <Bot className="h-5 w-5 flex-shrink-0" />
-          <span className="truncate">
-            <Trans i18nKey="sidebar.import_persona" />
-          </span>
-        </button>
+          <div className="px-3 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800 space-y-1 bg-white dark:bg-bg_secondary_dark">
+            <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400 pb-2">
+              <span>{t("folders.title")}</span>
+              <button
+                type="button"
+                onClick={handleCreateFolder}
+                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition"
+                aria-label={t("folders.create_button")}
+              >
+                <FolderPlus className="w-4 h-4" />
+              </button>
+            </div>
+            {renderFolderRow({
+              id: ALL_FOLDERS,
+              label: t("folders.all"),
+              countKey: ALL_FOLDERS,
+            })}
+            {folders.map((folder) =>
+              renderFolderRow({
+                id: folder.id,
+                label: folder.name,
+                countKey: folder.id,
+                canEdit: true,
+                folder,
+              })
+            )}
+          </div>
+
+          {/* Conversations List */}
+          <div className="mx-3 pt-4 space-y-1 pb-6">
+            {noSearchResults && (
+              <div className="text-center text-xs text-gray-500 dark:text-gray-400 py-4">
+                <Trans i18nKey="folders.search_no_results" values={{ query: searchQuery }} />
+              </div>
+            )}
+            {visibleConversations.map((conv) => {
+              const id = conv.id;
+              if (!conv) return null;
+              const isActive = id === selectedConversationId;
+              const isHovered = hoveredId === id;
+              const isMenuOpen = activeMenu === id;
+              const isDragging = draggingConversationId === id;
+
+              return (
+                <div
+                  key={id}
+                  onClick={() => handleSelectConversation(id)}
+                  draggable
+                  onDragStart={(event) => handleConversationDragStart(event, id)}
+                  onDragEnd={handleConversationDragEnd}
+                  className={`group relative px-3 py-3 rounded-2xl touch-manipulation border border-transparent ${
+                    isActive
+                      ? "bg-gray-100 dark:bg-gray-800 text-black dark:text-white shadow-sm"
+                      : "text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-100"
+                  } ${isDragging ? "border-tertiary/60 bg-tertiary/10 dark:bg-tertiary/20" : ""}`}
+                  data-current={isActive ? "true" : "false"}
+                  style={{
+                    WebkitTapHighlightColor: "transparent",
+                    minHeight: "52px",
+                  }}
+                >
+                  {/* Title container */}
+                  <div className="flex items-center h-full w-full group">
+                    <div
+                      className="flex-1 overflow-hidden min-w-0"
+                      title={conv.title || "Untitled Conversation"}
+                      onDoubleClick={(e) => handleTitleDoubleClick(e, conv)}
+                      style={{ cursor: isDesktop ? "text" : "pointer" }}
+                    >
+                      <div className="truncate text-xs font-medium leading-relaxed cursor-pointer">
+                        {highlightText(conv.title)}
+                      </div>
+                      {/* Removed folder label under "All chats" */}
+                    </div>
+
+                    {/* Dropdown Menu Button */}
+                    <div
+                      className={`transition-opacity duration-200 ${
+                        window.innerWidth < 1024 ||
+                        isHovered ||
+                        isActive ||
+                        isMenuOpen
+                          ? "opacity-100"
+                          : "opacity-0"
+                      } group-hover:opacity-100`}
+                    >
+                      <button
+                        ref={(el) => (menuButtonRefs.current[id] = el)}
+                        onClick={(e) => openMenu(e, id)}
+                        className={`p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 touch-manipulation flex items-center justify-center 
+                          hover:scale-110 active:scale-95 cursor-pointer`}
+                        style={{
+                          WebkitTapHighlightColor: "transparent",
+                        }}
+                      >
+                        <MoreVertical className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Bottom section */}
+        <div className="sticky bottom-0 bg-white dark:bg-bg_secondary_dark pt-3 pb-4 shadow-[0_-2px_6px_rgba(15,23,42,0.08)] dark:shadow-[0_-2px_6px_rgba(0,0,0,0.5)]">
+          <div className="flex flex-col gap-3 mx-3 border-t border-gray-200 dark:border-gray-500 pt-3">
+            <ImportConversationButton variant="button" />
+            <button
+              onClick={() => {
+                openModal("importPersona");
+              }}
+              className={`cursor-pointer w-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 text-black dark:text-white px-4 py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-medium touch-manipulation transition-colors`}
+              style={{
+                WebkitTapHighlightColor: "transparent",
+                minHeight: "44px",
+              }}
+            >
+              <Bot className="h-5 w-5 flex-shrink-0" />
+              <span className="truncate">
+                <Trans i18nKey="sidebar.import_persona" />
+              </span>
+            </button>
+          </div>
+        </div>
+
       </div>
 
       {/* MENU RENDERED OUTSIDE - PORTAL STYLE */}
