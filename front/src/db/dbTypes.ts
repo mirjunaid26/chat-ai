@@ -31,6 +31,7 @@ export type ConversationRow = {
   settings: ConversationSettings
   messageCount: number
   folderId?: string | null
+  hasFirstPrompt?: boolean
 }
 
 export type HydratedConversation = ConversationRow & {

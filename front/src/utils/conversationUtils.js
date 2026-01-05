@@ -77,6 +77,7 @@ export const getDefaultConversation = (userSettings = {}, folderId = null) => {
     createdAt: now,
     lastModified: now,
     folderId,
+    hasFirstPrompt: false,
   };
 };
 

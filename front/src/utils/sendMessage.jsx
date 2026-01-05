@@ -270,6 +270,7 @@ const sendMessage = async ({
         { role: "assistant", content: [{ type: "text", text: ""}], loading: true },
         { role: "user", content: [{ type: "text", text: "" }] },
       ],
+      hasFirstPrompt: true,
       flush: true // Save to DB immediately
     }));
 
@@ -532,7 +533,7 @@ const sendMessage = async ({
           ];
           updateConversation(
             conversationId,
-            { ...localState, messages },
+            { ...localState, messages, hasFirstPrompt: true },
             true
           );
           return prev;

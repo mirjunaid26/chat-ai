@@ -56,6 +56,21 @@ export class AppDB extends Dexie {
         }
       });
     });
+
+    this.version(4).stores({
+      conversations: 'id, lastModified, createdAt, title, folderId, [folderId+lastModified]',
+      messages: 'id, conversationId, [conversationId+idx], idx, createdAt',
+      content_items: 'id, messageId, [messageId+idx], idx, type',
+      files_meta: 'id, conversationId, type, size, name',
+      files_data: 'id',
+      folders: 'id, name, createdAt'
+    }).upgrade(async tx => {
+      await tx.table('conversations').toCollection().modify((conv: any) => {
+        if (typeof conv.hasFirstPrompt === 'undefined') {
+          conv.hasFirstPrompt = true;
+        }
+      });
+    });
   }
 }
 
@@ -69,6 +84,28 @@ export function newId(): string {
   }
   // Simple fallback
   return uuidv4();
+}
+
+function conversationHasPrompt(messages: Array<{ role?: MessageRole, content?: any }> = []): boolean {
+  for (const message of messages) {
+    if (message?.role !== 'user') continue;
+    const content = message.content;
+    if (typeof content === 'string') {
+      if (content.trim().length > 0) return true;
+      continue;
+    }
+    if (Array.isArray(content)) {
+      for (const item of content) {
+        if (!item) continue;
+        if (item.type === 'text') {
+          if ((item.text ?? '').trim().length > 0) return true;
+        } else {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 
@@ -174,6 +211,7 @@ export async function createConversation(params: {
   messages?: MessageInput[],
   id?: string, // for import
   folderId?: string | null
+  hasFirstPrompt?: boolean
 }) {
   const id = params?.id ?? newId()
   const now = Date.now()
@@ -181,6 +219,7 @@ export async function createConversation(params: {
   const settings = params.settings
   const messages = params.messages ?? []
   const folderId = params.folderId ?? null
+  const hasFirstPrompt = params.hasFirstPrompt ?? conversationHasPrompt(messages);
 
   await db.transaction('rw', db.conversations, db.messages, db.content_items, db.files_meta, db.files_data, async () => {
     await db.conversations.add({
@@ -191,10 +230,11 @@ export async function createConversation(params: {
       settings,
       messageCount: 0,
       folderId,
+      hasFirstPrompt,
     })
 
     if (messages.length > 0) {
-      await updateConversation(id, { title, settings, messages, folderId }, true)
+      await updateConversation(id, { title, settings, messages, folderId, hasFirstPrompt }, true)
     }
   })
 
@@ -266,6 +306,7 @@ export async function updateConversation(
     }>,
     lastModified?: number,
     folderId?: string | null,
+    hasFirstPrompt?: boolean,
   },
   force: boolean = false,
 ) {
@@ -299,6 +340,9 @@ export async function updateConversation(
         updatedAt: m.updatedAt,
         meta: m.meta
       }));
+      const hasFirstPromptValue = typeof data.hasFirstPrompt === 'boolean'
+        ? data.hasFirstPrompt
+        : conversationHasPrompt(normalizedMsgs);
 
       
 
@@ -403,7 +447,8 @@ export async function updateConversation(
       const convoUpdates: Partial<ConversationRow> = {
         title: data.title ?? convo.title,
         settings: data.settings ?? convo.settings,
-        lastModified: now
+        lastModified: now,
+        hasFirstPrompt: hasFirstPromptValue,
       };
       if ('folderId' in data) {
         convoUpdates.folderId = data.folderId ?? null;
@@ -588,7 +633,8 @@ function debounce<T extends (...args: any[]) => any>(fn: T, wait = 1000) {
 export function useConversationList() {
   const list = useLiveQuery(
     async () => {
-      return await db.conversations.orderBy('createdAt').reverse().toArray()
+      const rows = await db.conversations.orderBy('createdAt').reverse().toArray()
+      return rows.filter(conv => conv?.hasFirstPrompt !== false)
     },
   [],
   [] as ConversationRow[]
