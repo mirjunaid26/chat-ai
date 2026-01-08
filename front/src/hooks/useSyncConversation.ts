@@ -14,6 +14,7 @@ import { useModal } from "../modals/ModalContext";
 import { selectUserSettings } from "../Redux/reducers/userSettingsReducer";
 import { getDefaultConversation } from "../utils/conversationUtils";
 import { useImportConversation } from "./useImportConversation";
+import { decodeBase64UrlUtf8 } from "../utils/base64url";
 function validateConversationId(conversationId: string): boolean {
   return validateUUID(conversationId) && versionUUID(conversationId) === 4;
 }
@@ -122,31 +123,34 @@ async function loadConversation(navigate, conversationId, lastConversationId, us
 }
 
 function decodeSettings(base64Settings) {
-  let settings;
-  try{
-    // Base64 decode
-    const jsonString = atob(base64Settings);
-    // Parse into object
-    settings = JSON.parse(jsonString);
-    // Recursively URL-decode all string values
+  // New format: base64url(utf8(JSON)) with raw (un-URL-encoded) strings.
+  try {
+    const jsonString = decodeBase64UrlUtf8(base64Settings);
+    const settings = JSON.parse(jsonString);
+    if (settings && typeof settings === "object") return settings;
+  } catch {
+    // Fall through to legacy decoder for older shared links.
+  }
+
+  // Legacy format: base64(JSON) where string values were encodeURIComponent'd.
+  try {
+    const jsonString = atob(String(base64Settings).replace(/\s/g, "+"));
+    const settings = JSON.parse(jsonString);
     function decodeURIComponentDeep(obj) {
-      if (typeof obj === 'string') {
-        return decodeURIComponent(obj);
-      } else if (Array.isArray(obj)) {
-        return obj.map(decodeURIComponentDeep);
-      } else if (obj !== null && typeof obj === 'object') {
+      if (typeof obj === "string") return decodeURIComponent(obj);
+      if (Array.isArray(obj)) return obj.map(decodeURIComponentDeep);
+      if (obj !== null && typeof obj === "object") {
         return Object.fromEntries(
           Object.entries(obj).map(([k, v]) => [k, decodeURIComponentDeep(v)])
         );
       }
       return obj;
     }
-    settings = decodeURIComponentDeep(settings);
+    return decodeURIComponentDeep(settings);
   } catch (err) {
     console.warn("Failed to read settings", err);
     return {};
   }
-  return settings;
 }
 
 export function useSyncConversation({

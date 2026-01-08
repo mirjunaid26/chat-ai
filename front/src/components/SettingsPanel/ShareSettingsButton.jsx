@@ -2,6 +2,7 @@ import { Trans } from "react-i18next";
 import { useModal } from "../../modals/ModalContext";
 import { Share } from "lucide-react";
 import { useToast } from "../../hooks/useToast";
+import { encodeBase64UrlUtf8 } from "../../utils/base64url";
 
 export default function ShareSettingsButton({ localState, setLocalState }) {
   const { openModal } = useModal();
@@ -19,7 +20,7 @@ export default function ShareSettingsButton({ localState, setLocalState }) {
     try {
       // Prepare settings object for sharing
       const settings = {
-        system_prompt: encodeURIComponent(localState?.messages[0]?.content[0]?.text),
+        system_prompt: localState?.messages[0]?.content[0]?.text,
         // ["model-name"]: localState.settings["model-name"],
         // Model id
         model: {
@@ -55,7 +56,7 @@ export default function ShareSettingsButton({ localState, setLocalState }) {
 
       // Convert settings to base64 URL
       const settingsString = JSON.stringify(settings);
-      const encodedSettings = btoa(settingsString);
+      const encodedSettings = encodeBase64UrlUtf8(settingsString);
 
       const baseURL = window.location.origin;
       const url = `${baseURL}/chat?settings=${encodedSettings}`;
