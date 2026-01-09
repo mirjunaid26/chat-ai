@@ -19,6 +19,40 @@ function validateConversationId(conversationId: string): boolean {
   return validateUUID(conversationId) && versionUUID(conversationId) === 4;
 }
 
+function isPlainObject(value: unknown): value is Record<string, any> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function hasImportedWebSearchEnabled(settings: any): boolean {
+  if (!settings || typeof settings !== "object") return false;
+  const tools = isPlainObject(settings.tools) ? settings.tools : {};
+  const legacyEnableWebSearch = settings.enable_web_search === true;
+  return legacyEnableWebSearch || tools.web_search === true || tools.fetch_url === true;
+}
+
+function hasImportedMcpServers(settings: any): boolean {
+  if (!settings || typeof settings !== "object") return false;
+  const mcpServers = settings.mcp_servers;
+  if (typeof mcpServers === "string") return mcpServers.trim().length > 0;
+  if (Array.isArray(mcpServers)) return mcpServers.length > 0;
+  return false;
+}
+
+function coerceBoolean(value: any): boolean | undefined {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    const normalized = value.toLowerCase();
+    if (normalized === "true") return true;
+    if (normalized === "false") return false;
+  }
+  return undefined;
+}
+
+function coerceFiniteNumber(value: any): number | undefined {
+  const num = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(num) ? num : undefined;
+}
+
 async function loadConversation(navigate, conversationId, lastConversationId, userSettings = {}, sharedSettings = null, importURL = null, importConversation = null, searchParams = null): Promise<HydratedConversation | undefined> {
   // Handle import URL
   if (importURL) {
@@ -186,6 +220,7 @@ export function useSyncConversation({
   const latestStateRef = useRef(localState);
   const saveInFlight = useRef(false);
   const needsRetry = useRef(false);
+  const importDisclaimerDecisions = useRef(new Map<string, any>());
 
   // Effect 1: Try to load conversation on mount
   useEffect(() => {
@@ -195,27 +230,174 @@ export function useSyncConversation({
       //return;
     }
     (async () => {
+      if (sharedSettings) {
+        const decodedForDisclaimer = decodeSettings(sharedSettings);
+        const hasWebSearch = hasImportedWebSearchEnabled(decodedForDisclaimer);
+        const hasMcpServers = hasImportedMcpServers(decodedForDisclaimer);
+        const needsDisclaimer = hasWebSearch || hasMcpServers;
+
+        if (needsDisclaimer && !importDisclaimerDecisions.current.has(sharedSettings)) {
+          const decision = await new Promise((resolve) => {
+            openModal("importSettingsDisclaimer", {
+              hasWebSearch,
+              hasMcpServers,
+              onResolve: resolve,
+            });
+          });
+          importDisclaimerDecisions.current.set(sharedSettings, decision);
+        }
+
+        const decision = importDisclaimerDecisions.current.get(sharedSettings);
+        if (decision?.action === "cancel") {
+          setSearchParams();
+          const conversation = await loadConversation(
+            navigate,
+            conversationId,
+            lastConversationId,
+            userSettings,
+            null,
+            null,
+            importConversation,
+            null
+          );
+          if (conversation) setLocalState(conversation);
+          return;
+        }
+      }
+
       const conversation = await loadConversation(navigate, conversationId, lastConversationId, userSettings, sharedSettings, importURL, importConversation, searchParams);
       if (!conversation) return; // will navigate to a valid conversation soon
       lastModified.current[conversationId] = conversation?.lastModified || 0;
       if (sharedSettings) {
         // Decode and set settings from base64 string in URL
         const decodedSettings = decodeSettings(sharedSettings);
-        const system_prompt = decodedSettings?.system_prompt || decodedSettings?.systemPrompt ||
-          conversation?.messages?.content[0] || "";
-        delete decodedSettings?.system_prompt;
-        delete decodedSettings?.systemPrompt;
-        console.log(decodedSettings)
+
+        const hasWebSearch = hasImportedWebSearchEnabled(decodedSettings);
+        const hasMcpServers = hasImportedMcpServers(decodedSettings);
+
+        if ((hasWebSearch || hasMcpServers) && !importDisclaimerDecisions.current.has(sharedSettings)) {
+          const decision = await new Promise((resolve) => {
+            openModal("importSettingsDisclaimer", {
+              hasWebSearch,
+              hasMcpServers,
+              onResolve: resolve,
+            });
+          });
+          importDisclaimerDecisions.current.set(sharedSettings, decision);
+        }
+
+        const decision = importDisclaimerDecisions.current.get(sharedSettings);
+        if (decision?.action === "cancel") {
+          setSearchParams();
+          setLocalState(conversation);
+          return;
+        }
+
+        const shouldImportWebSearch =
+          !hasWebSearch
+            ? true
+            : decision?.action === "allow"
+            ? decision.allowWebSearch !== false
+            : decision?.action === "disallow"
+            ? false
+            : true;
+
+        const shouldImportMcpServers =
+          !hasMcpServers
+            ? true
+            : decision?.action === "allow"
+            ? decision.allowMcpServers !== false
+            : decision?.action === "disallow"
+            ? false
+            : true;
+
+        const system_prompt =
+          decodedSettings?.system_prompt ||
+          decodedSettings?.systemPrompt ||
+          conversation?.messages?.[0]?.content?.[0]?.text ||
+          "";
+
+        const importedToolsRaw = isPlainObject(decodedSettings?.tools) ? decodedSettings.tools : {};
+        const importedTools: any = { ...importedToolsRaw };
+
+        if (!shouldImportWebSearch) {
+          delete importedTools.web_search;
+          delete importedTools.fetch_url;
+        }
+
+        if (!shouldImportMcpServers) {
+          delete importedTools.mcp;
+        }
+
+        const nextTools: any = {
+          ...(conversation.settings?.tools || {}),
+          ...importedTools,
+        };
+
+        if (decodedSettings?.enable_web_search === true && shouldImportWebSearch) {
+          nextTools.web_search = true;
+          nextTools.fetch_url = true;
+        }
+
+        const nextSettings: any = { ...conversation.settings };
+
+        if (decodedSettings?.model != null) {
+          nextSettings.model =
+            typeof decodedSettings.model === "string"
+              ? { id: decodedSettings.model }
+              : decodedSettings.model;
+        }
+
+        const temperature = coerceFiniteNumber(decodedSettings?.temperature);
+        if (temperature !== undefined) nextSettings.temperature = temperature;
+
+        const topP = coerceFiniteNumber(decodedSettings?.top_p);
+        if (topP !== undefined) nextSettings.top_p = topP;
+
+        const enableTools = coerceBoolean(decodedSettings?.enable_tools);
+        if (enableTools !== undefined) nextSettings.enable_tools = enableTools;
+
+        if (decodedSettings?.arcana && typeof decodedSettings.arcana === "object") {
+          const arcanaId = decodedSettings.arcana?.id;
+          if (typeof arcanaId === "string") {
+            nextSettings.arcana = { ...(nextSettings.arcana || {}), id: arcanaId };
+          }
+        }
+
+        if (hasMcpServers && shouldImportMcpServers) {
+          const mcpServers = decodedSettings?.mcp_servers;
+          if (typeof mcpServers === "string" || Array.isArray(mcpServers)) {
+            nextSettings.mcp_servers = mcpServers;
+          }
+        }
+
+        nextSettings.tools = nextTools;
+
         const updatedConversation = {
           ...conversation,
           messages: [
             {"role": "system", "content": [{"type": "text", "text": system_prompt}]},
             ...conversation.messages.slice(1),
           ],
-          settings: {...conversation.settings, ...decodedSettings}
+          settings: nextSettings
         }
         setSearchParams();
         setLocalState( updatedConversation );
+        // Persist imported settings immediately so they are retained when switching chats.
+        try {
+          const baseLastModified = conversation?.lastModified ?? 0;
+          const newLastModified = await updateConversation(conversation.id, {
+            title: updatedConversation.title,
+            settings: updatedConversation.settings,
+            messages: updatedConversation.messages,
+            lastModified: baseLastModified,
+          });
+          if (newLastModified !== -1) {
+            lastModified.current[conversation.id] = newLastModified;
+          }
+        } catch (error) {
+          console.error("Failed to persist imported settings:", error);
+        }
         return;
       }
       if (searchParams?.size > 0) {

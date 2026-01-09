@@ -14,6 +14,8 @@ export default {
     share: "Teilen",
     delete: "Löschen",
     cancel: "Abbrechen",
+    allow: "Erlauben",
+    disallow: "Nicht erlauben",
     refresh: "Aktualisieren",
     notice: "Hinweis",
     disclaimer: "Haftungsausschluss",
@@ -321,6 +323,13 @@ export default {
     // External models
     settings_external:
       "Diese Einstellungen wirken sich nicht auf externe (OpenAI) Modelle aus.",
+    import_settings_title: "Importierte Einstellungen prüfen",
+    import_settings_intro:
+      "Dieser geteilte Einstellungs-Link enthält Optionen, die Teile Ihrer Unterhaltung an externe Dienste senden können. Wählen Sie aus, was importiert werden soll.",
+    import_web_search_disclaimer:
+      `Wenn die Websuche aktiviert ist, kann die KI auf Grundlage Ihrer Nachricht und des Gesprächsverlaufs Suchanfragen erstellen und diese an eine Suchmaschine (z. B. Google) senden.\n\nErlauben Sie dies nur, wenn Sie damit einverstanden sind, dass Ihre Daten extern verarbeitet werden, und wenn Sie während der aktiven Websuche keine vertraulichen, persönlichen oder sensiblen Informationen teilen.`,
+    import_mcp_disclaimer:
+      `MCP-Server können außerhalb der GWDG betrieben werden. Wenn aktiviert, kann die KI Daten an konfigurierte MCP-Server senden, um Tool-Anfragen auszuführen.\n\nErlauben Sie dies nur, wenn Sie den konfigurierten MCP-Servern vertrauen und keine vertraulichen, persönlichen oder sensiblen Informationen mit ihnen teilen.`,
     web_search_disclaimer: `Wenn die Websuche aktiviert ist, kann die KI auf Grundlage Ihrer Nachricht und des gesamten Gesprächsverlaufs Suchanfragen erstellen und diese an eine Suchmaschine (z. B. Google) senden, um aktuelle Informationen abzurufen. Dies hilft, genauere und aktuellere Antworten bereitzustellen.\n\nDurch Klicken auf „Ich verstehe“ stimmen Sie zu, dass Ihre Eingaben auf diese Weise verarbeitet werden, und bestätigen, dass Sie während der aktiven Websuche keine vertraulichen, persönlichen oder sensiblen Informationen teilen.`,
   },
   // Landing page
