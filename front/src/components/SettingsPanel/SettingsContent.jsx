@@ -448,7 +448,6 @@ const SettingsPanel = ({ localState, setLocalState, userData, modelsData }) => {
             {/* Share Settings Button */}
             <ShareSettingsButton
               localState={localState}
-              setLocalState={setLocalState}
             />
 
             {/* Reset Default Button */}

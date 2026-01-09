@@ -198,6 +198,7 @@ export default {
     export_settings: "Modell und Optionen einbeziehen",
     export_files: "Dateien einbeziehen",
     export_arcana: "Arcana-Details einbeziehen",
+    export_mcp_servers: "MCP-Server einbeziehen",
   },
   // Rename Conversation Modal
   rename_conversation: {
@@ -213,9 +214,11 @@ export default {
   // Share Settings Modal
   share_settings: {
     description:
-      "Mit dieser Funktion wird ein Link für das von Ihnen gewählte Modell, die Systemansage und die Einstellungen erstellt, der gemeinsam genutzt werden kann. Jeder Benutzer, der diesen Link öffnet, kann dieselbe Konfiguration in seinen eigenen Unterhaltungen verwenden. Bitte beachten Sie, dass Ihr Gesprächsverlauf nicht freigegeben wird.",
+      "Mit dieser Funktion wird ein Link erstellt, der Ihr Modell, den Systemprompt und Ihre Einstellungen (einschließlich Tool-Konfiguration) enthält. Jeder Benutzer, der diesen Link öffnet, kann dieselbe Konfiguration in seinen eigenen Unterhaltungen verwenden. Ihr Gesprächsverlauf wird nicht freigegeben.",
     warn_arcana:
       "Warnung: Die Weitergabe von arcana-Details kann die in arcana hochgeladenen Daten gefährden.",
+    warn_mcp:
+      "Warnung: Die Weitergabe eines MCP-Servers kann dazu führen, dass Eingaben oder Daten beim Einsatz von MCP an diesen Server gesendet werden.",
   },
   // Help modals
   help: {
@@ -297,6 +300,8 @@ export default {
       "PRIVACY WARNUNG: Ihre Daten können an externe Server gesendet werden.",
     arcana_export:
       "Warnung: Das Exportieren von Arcana-Details in eine Datei kann Ihre privaten Daten gefährden, da sie für andere zugänglich sind.",
+    mcp_export:
+      "Warnung: Das Exportieren von MCP-Serverdaten in eine Datei kann externe Endpunkte offenlegen und dazu führen, dass Daten an Drittanbieter-Server gesendet werden.",
     model_offline:
       "Das von Ihnen ausgewählte Modell ist derzeit offline. Durch das Anklicken von OK unten startet das Modell und wird in wenigen Minuten online sein. In der Zwischenzeit können Sie gerne ein anderes Modell auswählen.",
     session_expired:

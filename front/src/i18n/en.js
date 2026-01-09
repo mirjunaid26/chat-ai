@@ -198,6 +198,7 @@ export default {
     export_settings: "Include model and options",
     export_files: "Include files",
     export_arcana: "Include Arcana details",
+    export_mcp_servers: "Include MCP server",
   },
   // Rename Conversation Modal
   rename_conversation: {
@@ -213,9 +214,11 @@ export default {
   // Share Settings Modal
   share_settings: {
     description:
-      "This feature creates a shareable link for your chosen model, system prompt, and settings. Any user who opens this link will be able to use the same configuration in their own conversations. Please note that your conversation history will not be shared.",
+      "This feature creates a shareable link containing your model, system prompt, and settings (including tool configuration). Anyone who opens this link can use the same setup in their own conversations. Your conversation history will not be shared.",
     warn_arcana:
       "Warning: Sharing arcana details may compromise data uploaded in the arcana.",
+    warn_mcp:
+      "Warning: Sharing an MCP server may route prompts or data to that server when MCP is used.",
   },
   // Help modals
   help: {
@@ -298,6 +301,8 @@ export default {
     mcp_usage: "PRIVACY WARNING: Your data may be sent to external servers.",
     arcana_export:
       "Warning: Exporting Arcana details to a file may compromise your private data, as it can be accessed by others.",
+    mcp_export:
+      "Warning: Exporting MCP server details to a file may expose external endpoints and can lead to data being sent to third-party servers.",
     model_offline:
       "The model you selected is currently offline. By pressing OK below, the model starts up and will be online in a few minutes. In the meantime, feel free to choose another model.",
     session_expired: "Your session has expired. Please press OK to refresh.",
