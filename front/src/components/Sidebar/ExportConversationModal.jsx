@@ -20,6 +20,7 @@ export default function ExportConversationModal({
   const [exportFormat, setExportFormat] = useState("json");
   const [exportSettings, setExportSettings] = useState(true);
   const [exportArcana, setExportArcana] = useState(false);
+  const [exportMcpServers, setExportMcpServers] = useState(false);
   const [exportFiles, setExportFiles] = useState(false);
   const [containsFiles, setContainsFiles] = useState(true); // TODO set dynamically
   const [conversation, setConversation] = useState(null);
@@ -55,6 +56,13 @@ export default function ExportConversationModal({
   const isArcanaSupported = conversation.settings?.model?.input?.includes("arcana") || conversation.settings?.enable_tools;
   const messages = conversation?.messages
   const arcana = conversation?.settings?.arcana
+  const mcpServers = conversation?.settings?.mcp_servers;
+  const hasMcpServers =
+    typeof mcpServers === "string"
+      ? mcpServers.trim().length > 0
+      : Array.isArray(mcpServers)
+      ? mcpServers.length > 0
+      : false;
 
   // Function to generate timestamped filename for exports
   const generateFileName = (extension) => {
@@ -125,7 +133,7 @@ export default function ExportConversationModal({
     if (conversation?.title) settings.title = conversation.title;
     if (conversation?.settings?.temperature !== undefined && conversation?.settings?.temperature !== null) settings.temperature = conversation.settings.temperature;
     if (conversation?.settings?.enable_tools) settings.enable_tools = conversation.settings.enable_tools;
-    if (conversation?.settings?.mcp_servers) settings.mcp_servers = conversation.settings.mcp_servers;
+    if (exportMcpServers && hasMcpServers) settings.mcp_servers = conversation.settings.mcp_servers;
     if (conversation?.settings?.top_p) settings.top_p = conversation.settings.top_p;
     if (conversation?.settings?.tools) settings.tools = Object.keys(conversation.settings.tools)
         .filter(t => conversation.settings.tools[t] === true)
@@ -175,6 +183,9 @@ export default function ExportConversationModal({
       // Add settings information if enabled
       if (exportSettings) {
         let settings = processSettings();
+        const mcpServersText = Array.isArray(settings?.mcp_servers)
+          ? settings.mcp_servers.join(", ")
+          : settings?.mcp_servers;
         const additionalText =
         `\n\nConversation settings\ntitle: ${
           conversation.title
@@ -187,7 +198,10 @@ export default function ExportConversationModal({
         }\ntop_p: ${
           settings?.top_p
         }\n${exportArcana && isArcanaSupported && settings?.arcana?.id
-            ? `Arcana ID: ${settings.arcana.id}}`
+            ? `Arcana ID: ${settings.arcana.id}`
+            : ""
+        }${exportMcpServers && hasMcpServers && mcpServersText
+            ? `\nMCP server: ${mcpServersText}`
             : ""
         }`;
         textContent += additionalText;
@@ -446,7 +460,9 @@ export default function ExportConversationModal({
         let settings = processSettings();
         addNewPageIfNeeded(
           lineHeight *
-            (exportArcana && isArcanaSupported ? 8 : 6)
+            (6 +
+              (exportArcana && isArcanaSupported && settings?.arcana?.id ? 1 : 0) +
+              (exportMcpServers && hasMcpServers && settings?.mcp_servers ? 1 : 0))
         );
         y += lineHeight * 2;
 
@@ -467,6 +483,14 @@ export default function ExportConversationModal({
         // Add Arcana settings if enabled
         if (exportArcana && isArcanaSupported && settings?.arcana?.id) {
           doc.text(`Arcana ID ${settings?.arcana?.id}`, margin, y);
+          y += lineHeight;
+        }
+
+        if (exportMcpServers && hasMcpServers && settings?.mcp_servers) {
+          const mcpServersText = Array.isArray(settings.mcp_servers)
+            ? settings.mcp_servers.join(", ")
+            : settings.mcp_servers;
+          doc.text(`MCP server: ${mcpServersText}`, margin, y);
           y += lineHeight;
         }
       }
@@ -516,6 +540,10 @@ export default function ExportConversationModal({
     setExportArcana(event.target.checked);
   };
 
+  const toggleExportMcpServers = (event) => {
+    setExportMcpServers(event.target.checked);
+  };
+
   return (
     <BaseModal
       isOpen={isOpen}
@@ -552,9 +580,11 @@ export default function ExportConversationModal({
         {/* Arcana Export Option */}
         {arcana?.id && isArcanaSupported && exportSettings ? (
           <>
-            <p className="text-red-600 text-xs">
-              <Trans i18nKey="alert.arcana_export" />
-            </p>
+            {exportArcana && (
+              <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200">
+                <Trans i18nKey="alert.arcana_export" />
+              </p>
+            )}
             <div className="flex items-center gap-3">
               <input
                 type="checkbox"
@@ -571,6 +601,32 @@ export default function ExportConversationModal({
                 className="text-xs text-gray-700 dark:text-gray-300 cursor-pointer select-none"
               >
                 <Trans i18nKey="export_conversation.export_arcana" />
+              </label>
+            </div>
+          </>
+        ) : null}
+
+        {/* MCP servers Export Option */}
+        {hasMcpServers && exportSettings ? (
+          <>
+            {exportMcpServers && (
+              <p className="rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200">
+                <Trans i18nKey="alert.mcp_export" />
+              </p>
+            )}
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="exportMcpServers"
+                checked={exportMcpServers}
+                onChange={toggleExportMcpServers}
+                className="h-5 w-5 rounded-md border-gray-300 text-tertiary focus:ring-tertiary cursor-pointer transition duration-200 ease-in-out"
+              />
+              <label
+                htmlFor="exportMcpServers"
+                className="text-xs text-gray-700 dark:text-gray-300 cursor-pointer select-none"
+              >
+                <Trans i18nKey="export_conversation.export_mcp_servers" />
               </label>
             </div>
           </>

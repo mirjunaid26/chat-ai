@@ -2,14 +2,15 @@ import { Trans } from "react-i18next";
 import { useModal } from "../../modals/ModalContext";
 import { Share } from "lucide-react";
 import { useToast } from "../../hooks/useToast";
+import { encodeBase64UrlUtf8 } from "../../utils/base64url";
 
-export default function ShareSettingsButton({ localState, setLocalState }) {
+export default function ShareSettingsButton({ localState }) {
   const { openModal } = useModal();
   const { notifyError, notifySuccess } = useToast();
   // ==== SHARING FUNCTIONALITY ====
 
   // Generate and copy shareable settings URL
-  const handleShareSettings = (shareArcana = false) => {
+  const handleShareSettings = (shareArcana = false, shareMcpServers = false) => {
     // Validate system prompt exists
     if (!localState?.messages[0]?.content[0]?.text) {
       notifyError("System prompt is missing");
@@ -17,9 +18,20 @@ export default function ShareSettingsButton({ localState, setLocalState }) {
     }
 
     try {
+      const rawTools = localState?.settings?.tools || {};
+      const tools = {
+        ...rawTools,
+        video_generation: rawTools.video_generation ?? false,
+      };
+      const mcpServers = localState?.settings?.mcp_servers;
+      const hasMcpServers =
+        typeof mcpServers === "string" && mcpServers.trim().length > 0;
+      const shouldShareMcpServers =
+        !!shareMcpServers && hasMcpServers;
+
       // Prepare settings object for sharing
       const settings = {
-        system_prompt: encodeURIComponent(localState?.messages[0]?.content[0]?.text),
+        system_prompt: localState?.messages[0]?.content[0]?.text,
         // ["model-name"]: localState.settings["model-name"],
         // Model id
         model: {
@@ -39,7 +51,8 @@ export default function ShareSettingsButton({ localState, setLocalState }) {
             : null,
         // tools
         enable_tools: localState?.settings?.enable_tools,
-        enable_web_search: localState?.settings?.enable_web_search,
+        tools: tools,
+        ...(shouldShareMcpServers && { mcp_servers: mcpServers }),
         // Include arcana settings if enabled
         ...(shareArcana && {
             arcana: {
@@ -55,7 +68,7 @@ export default function ShareSettingsButton({ localState, setLocalState }) {
 
       // Convert settings to base64 URL
       const settingsString = JSON.stringify(settings);
-      const encodedSettings = btoa(settingsString);
+      const encodedSettings = encodeBase64UrlUtf8(settingsString);
 
       const baseURL = window.location.origin;
       const url = `${baseURL}/chat?settings=${encodedSettings}`;
@@ -91,7 +104,15 @@ export default function ShareSettingsButton({ localState, setLocalState }) {
     <button
       className="text-white p-3 bg-green-600 hover:bg-green-550 active:bg-green-700 dark:border-border_dark rounded-lg justify-center items-center md:w-fit shadow-lg dark:shadow-dark border select-none flex gap-2 cursor-pointer"
       type="reset"
-      onClick={() => openModal("shareSettings", {localState, setLocalState, handleShareSettings})}
+      onClick={() =>
+        openModal("shareSettings", {
+          handleShareSettings,
+          showArcanaOption: !!localState?.settings?.arcana?.id,
+          showMcpServersOption:
+            typeof localState?.settings?.mcp_servers === "string" &&
+            localState.settings.mcp_servers.trim().length > 0,
+        })
+      }
     >
       {/* <ShareSettingsModal
             isOpen={modalShareSettings}

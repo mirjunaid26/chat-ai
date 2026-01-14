@@ -36,6 +36,7 @@ import HelpWebSearchModal from "./Help/HelpWebSearchModal";
 import WebSearchDisclaimer from "./Alert/WebSearchDisclaimer";
 import WelcomeModal from "./Help/WelcomeModal";
 import HelpMCPModal from "./Help/HelpMCPModal";
+import ImportSettingsDisclaimerModal from "./Alert/ImportSettingsDisclaimerModal";
 
 const ModalContext = createContext();
 
@@ -155,6 +156,13 @@ export function ModalProvider({ children }) {
       )}
       {modalType === "disclaimerWebSearch" && (
         <WebSearchDisclaimer isOpen onClose={closeModal} {...modalProps} />
+      )}
+      {modalType === "importSettingsDisclaimer" && (
+        <ImportSettingsDisclaimerModal
+          isOpen
+          onClose={closeModal}
+          {...modalProps}
+        />
       )}
       {modalType === "migrate" && (
         <MigrateDataModal
