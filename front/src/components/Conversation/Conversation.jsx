@@ -337,22 +337,25 @@ export default function Conversation({
         {/* Bottom panel */}
         {localState?.messages?.length >= 4 && (
           <div className="w-full select-none h-fit px-3 py-1.5 flex justify-between items-center bg-white dark:bg-bg_secondary_dark rounded-b-2xl border-t border-gray-200 dark:border-gray-700">
-            <ClearMessagesButton
-              localState={localState}
-              setLocalState={setLocalState}
-            />
-            <div className="flex items-baseline gap-4">
+            <div className="flex items-baseline gap-3">
+              {/* Clear Message button */}
+              <ClearMessagesButton
+                localState={localState}
+                setLocalState={setLocalState}
+              />
               {/* Summary button */}
               <SummaryButton
                   localState={localState}
                   setLocalState={setLocalState}
-              />
+                />
             </div>
-            <div className="flex items-baseline gap-4">
+            <div className="flex items-baseline gap-3">
+              {/* Export button */}
               <ExportButton
                 localState={localState}
                 setLocalState={setLocalState}
               />
+              {/* Undo button */}
               <UndoButton
                 localState={localState}
                 setLocalState={setLocalState}

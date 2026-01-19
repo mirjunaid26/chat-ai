@@ -14,7 +14,7 @@ import type {
   MessageInput,
   MessageRole,
   ContentItemInput,
-  FolderRow
+  FolderRow,
   FeedbackRow
 } from "./dbTypes"
 

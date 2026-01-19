@@ -27,13 +27,12 @@ export default React.memo(({ localState, setLocalState, message_index }) => {
   const [renderMode, setRenderMode] = useState("Default");
   // Define render modes with better styling
   const renderModes = ["Default", "Markdown", "LaTeX", "Plaintext"];
-
-  const isfeedbackModeEnabled = import.meta.env.VITE_FEEDBACK_MODE || false;
   
   const sendMessage = useSendMessage();
   const navigate = useNavigate();
   const { notifySuccess, notifyError } = useToast();
   const [forking, setForking] = useState(false);
+  const feedbackModule = import.meta.env.VITE_MODULE_FEEDBACK === "true";
 
   //Functions
   const adjustHeight = () => {
@@ -429,7 +428,7 @@ export default React.memo(({ localState, setLocalState, message_index }) => {
                   </div>
                 </div>
 
-                {isfeedbackModeEnabled && ! feedbackMode && (
+                {feedbackModule && (
                   <FeedbackButtons
                     localState={localState}
                     setLocalState={setLocalState}

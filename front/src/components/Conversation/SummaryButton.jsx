@@ -1,5 +1,7 @@
-import { Edit } from "lucide-react";
+import { Shrink } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useSendMessage } from "../../hooks/useSendMessage";
+import Tooltip from "../Others/Tooltip";
 import i18n from "i18next";
 
 export default function SummaryButton({
@@ -7,6 +9,10 @@ export default function SummaryButton({
   setLocalState
 }) {
   const sendMessage = useSendMessage();
+  const { t } = useTranslation();
+  const loading = localState.messages[localState.messages.length - 2]?.role === "assistant"
+    ? localState.messages[localState.messages.length - 2]?.loading || false
+    : false;
 
   const handleSummary = async () => {
     // Summarize messages before index
@@ -31,11 +37,14 @@ export default function SummaryButton({
   };
 
   return (
-      <button onClick={handleSummary} title={i18n.t("common.summarize")}>
-          <Edit
-              className="h-[22px] w-[22px] cursor-pointer text-[#009EE0]"
-              alt="edit_icon"
-          />
+    <Tooltip text={t("common.summarize")}>
+      <button
+        className="h-[26px] w-[26px] cursor-pointer"
+        onClick={handleSummary}
+        disabled={loading}
+      >
+        <Shrink className="cursor-pointer h-[26px] w-[26px] text-[#009EE0] hover:text-blue-600 transition-colors" />
       </button>
+    </Tooltip>
   );
 }

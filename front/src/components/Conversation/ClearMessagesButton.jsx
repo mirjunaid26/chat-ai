@@ -42,7 +42,7 @@ export default function ClearMessagesButton({localState, setLocalState}) {
         onClick={handleClearHistory}
       >
         <X
-          className="cursor-pointer h-[22px] w-[22px] text-[#009EE0] hover:text-red-500 transition-colors"
+          className="cursor-pointer h-[26px] w-[26px] text-[#009EE0] hover:text-red-500 transition-colors"
         />
       </button>
     </Tooltip>

@@ -54,7 +54,7 @@ export default function UndoButton({ localState, setLocalState }) {
       <button
         className="h-[26px] w-[26px] cursor-pointer"
         onClick={handleUndo}
-        disabled={loading} // TODO handle loading
+        disabled={loading}
       >
         <Undo2 className="cursor-pointer h-[26px] w-[26px] text-[#009EE0] hover:text-blue-600 transition-colors" />
       </button>

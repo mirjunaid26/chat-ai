@@ -53,6 +53,8 @@ const SettingsPanel = ({ localState, setLocalState, userData, modelsData }) => {
   const userSettings = useSelector(selectUserSettings);
   const settings = localState.settings;
   const tools = settings?.tools || {};
+  const toolsModule = import.meta.env.VITE_MODULE_TOOLS  === "true";
+  const choicesModule = import.meta.env.VITE_MODULE_CHOICES  === "true";
   const showArcanaBox = !!settings?.enable_tools && !!tools.arcana;
   const showMCPBox = !!settings?.enable_tools && !!tools.mcp;
   const showVideoList = !!tools.video_generation;
@@ -405,10 +407,11 @@ const SettingsPanel = ({ localState, setLocalState, userData, modelsData }) => {
             localState={localState}
             setLocalState={setLocalState}
           /> */}
-          <ToolsContainer
-            localState={localState}
-            setLocalState={setLocalState}
-          />
+          {toolsModule && <ToolsContainer
+              localState={localState}
+              setLocalState={setLocalState}
+            />
+          }
           {showVideoList && (
             <VideoList
               jobs={[]}
@@ -441,10 +444,10 @@ const SettingsPanel = ({ localState, setLocalState, userData, modelsData }) => {
             localState={localState}
             setLocalState={setLocalState}
           />
-          <ChoiceProposer
+          {choicesModule && <ChoiceProposer
             localState={localState}
             setLocalState={setLocalState}
-          />
+          />}
           {/* System Prompt */}
           <SystemPromptContainer
             localState={localState}

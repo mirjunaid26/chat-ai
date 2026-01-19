@@ -198,6 +198,11 @@ const sendMessage = async ({
 
   try {
     const isArcanaSupported = localState.settings.model?.input?.includes("arcana") || (localState.settings?.enable_tools && !!localState.settings.tools.arcana)   
+
+    const feedbackModule = import.meta.env.VITE_MODULE_FEEDBACK === "true";
+    const toolsModule = import.meta.env.VITE_MODULE_TOOLS === "true";
+    const choicesModule = import.meta.env.VITE_MODULE_CHOICES === "true";
+
     let finalConversationForState; // For local state updates
     let conversationForAPI = await buildConversationForAPI(localState);
     // Prepare system prompt
@@ -211,7 +216,7 @@ const sendMessage = async ({
     }
     
     // Handle tools
-    if (conversationForAPI.settings?.enable_tools) {
+    if (toolsModule && conversationForAPI.settings?.enable_tools) {
       // Inject the current date and time to the system prompt in human-readable format
       const currentDate = new Date().toLocaleString();
       systemPromptAPI = `\n\n--- Begin System Context ---\nCurrent Date: ${currentDate}\n--- End System Context ---` + systemPromptAPI;
@@ -265,14 +270,13 @@ const sendMessage = async ({
     // Ensure timeout value is within valid range
     const timeoutAPI = (timeout >= 5000 && timeout <= 900000) ? timeout : 300000;
     
-    const isfeedbackMode = import.meta.env.VITE_FEEDBACK_MODE || false;
-    if(isfeedbackMode){
-      // add feedback information
+    if(feedbackModule){
+      // add Feedback information
       if (conversationForAPI.settings?.tools == undefined){
         conversationForAPI.settings.tools = {
             enabled: true
           }
-      }else{
+      } else{
         conversationForAPI.settings.tools.enabled = true;
       }
       let message = localState.messages[localState.messages.length - 1];
@@ -553,7 +557,7 @@ const sendMessage = async ({
       console.error(error);
     } finally {
       // Update choices
-      if(localState.settings.choiceProposer == 1){
+      if(choicesModule && localState.settings.choiceProposer == 1){
         try {
           const content = localState.messages.map((message) => {
           if (Array.isArray(message.content)){

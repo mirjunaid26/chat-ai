@@ -8,7 +8,7 @@ export default {
     save: "Save",
     import: "Import Chat",
     export: "Export Chat",
-    summarize: "Summarize conversation up to that point and replace it.",
+    summarize: "Summarize and Replace",
     clear: "Clear",
     abort: "Abort",
     send: "Send",

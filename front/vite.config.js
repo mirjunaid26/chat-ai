@@ -51,9 +51,15 @@ try {
     } else if (key == "announcement") {
       process.env["VITE_ANNOUNCEMENT"] = value;
       console.log("Announcement:", value);
-    } else if (key == "feedbackMode"){
-      process.env["VITE_FEEDBACK_MODE"] = value;
-      console.log("Feedback Mode:", value);
+    } else if (key == "modules"){
+      console.log("Modules:", JSON.stringify(value));
+      try {
+        process.env["VITE_MODULE_TOOLS"] = value?.tools || false;
+        process.env["VITE_MODULE_FEEDBACK"] = value?.feedback  || false;
+        process.env["VITE_MODULE_CHOICES"] = value?.choices  || false;
+      } catch (e) {
+        console.log("Error while parsing modules: ", e)
+      }
     }
   }
 } catch (error) {

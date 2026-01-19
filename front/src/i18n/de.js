@@ -8,7 +8,7 @@ export default {
     save: "Speichern",
     import: "Chat importieren",
     export: "Chat exportieren",
-    summarize: "Den bestehenden Chat zusammenfassen und ersetzen.",
+    summarize: "Zusammenfassen und ersetzen",
     clear: "Löschen",
     abort: "Abbrechen",
     send: "Senden",
