@@ -4,6 +4,8 @@ export default {
     loading: "Lädt...",
     undo: "Rückgängig",
     rename: "Umbenennen",
+    create: "Erstellen",
+    save: "Speichern",
     import: "Chat importieren",
     export: "Chat exportieren",
     summarize: "Den bestehenden Chat zusammenfassen und ersetzen.",
@@ -37,6 +39,36 @@ export default {
   sidebar: {
     new_conversation: "Neues Gespräch",
     import_persona: "Mit Persona chatten",
+    expand: "Ausklappen",
+    extend: "Ausklappen",
+    open_sidebar: "Seitenleiste öffnen",
+    close_sidebar: "Seitenleiste schließen",
+    rename_tooltip: "Umbenennen: {{title}}",
+    shortcut_new_conversation: "Strg + Shift + O",
+  },
+  folders: {
+    title: "Ordner",
+    all: "Alle Chats",
+    uncategorized: "Ohne Ordner",
+    create_button: "Neuer Ordner",
+    search_label: "Suche",
+    search_placeholder: "Chats nach Titel durchsuchen",
+    search_no_results: 'Keine Treffer für "{{query}}"',
+    clear_search: "Suche löschen",
+    create_title: "Ordner erstellen",
+    rename_title: "Ordner umbenennen",
+    delete_title: "Ordner löschen",
+    delete_description:
+      'Ordner "{{name}}" löschen? Unterhaltungen bleiben erhalten und erscheinen unter "Ohne Ordner".',
+    name_label: "Ordnername",
+    name_placeholder: "Ordnername eingeben",
+    error_required: "Bitte einen Ordnernamen eingeben.",
+    error_generic: "Aktion konnte nicht ausgeführt werden. Bitte erneut versuchen.",
+    move_title: "Konversation verschieben",
+    move_description: 'Ordner für "{{title}}" auswählen',
+    move_action: "Verschieben",
+    new_folder_prompt: "Neuen Ordner anlegen?",
+    create_inline: "Erstellen",
   },
   // Settings panel
   settings: {
@@ -44,6 +76,7 @@ export default {
     tools_disabled: "Werkzeuge sind deaktiviert",
     web_search_enabled: "Websuche ist erlaubt",
     web_search_disabled: "Websuche ist deaktiviert",
+    close_panel: "Einstellungen schließen",
     system_prompt_placeholder: "System-Prompt hier eingeben",
     reset_default: "Standard zurücksetzen",
     default: "Standard",
@@ -97,6 +130,7 @@ export default {
     references: "Referenzen",
     empty_message:
       "Ihre Gespräche werden niemals auf unseren Servern gespeichert.",
+    untitled: "Unbenannte Unterhaltung",
   },
   // Footer
   footer: {
@@ -107,7 +141,7 @@ export default {
     faq: "FAQ",
     contact: "Kontakt",
     about: "Über uns",
-    copyright: "2025 GWDG © Alle Rechte vorbehalten",
+    copyright: "{{year}} GWDG © Alle Rechte vorbehalten",
     iso_certified: "ISO 27001 Zertifiziert",
   },
   // User Settings Modal
@@ -245,6 +279,10 @@ export default {
     top_p:
       "top_p ist ein Schieberegler von 0 bis 1, der den Gesamtbestand der Wahrscheinlichkeiten anpasst, die für das nächste Token in Betracht gezogen werden. Ein top_p von 0,1 würde bedeuten, dass nur die oberen 10% der kumulativen Wahrscheinlichkeiten berücksichtigt werden. Die Variation von top_p hat einen ähnlichen Effekt auf Vorhersagbarkeit und Kreativität wie die Temperatur.",
   },
+  model_selector: {
+    docs_hint_text: "Unsicher, welches Modell Sie wählen sollen?",
+    docs_hint_link: "Lesen Sie die Modellübersicht.",
+  },
   // Tour
   tour: {
     welcome_message: "Willkommen bei Chat AI",
@@ -296,6 +334,9 @@ export default {
     data_security_notice: "Ihre Daten werden sicher innerhalb unserer Server verarbeitet. Es werden keine Informationen außerhalb der GWDG übertragen.",
     arcana_usage:
       "Halten Sie Temperatur auf 0 und top_p auf 0.05 für optimale Arcana-Ergebnisse",
+    arcana_create_collection_prefix:
+      "Erstellen Sie Ihre eigene Dokumentensammlung",
+    arcana_create_collection_link: "hier",
     web_search_usage:
       "PRIVACY WARNUNG: Ihr Verlauf kann an eine Suchmaschine (z. B. Google) gesendet werden",
     mcp_usage:

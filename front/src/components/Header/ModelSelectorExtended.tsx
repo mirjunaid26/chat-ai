@@ -4,6 +4,7 @@ import Tooltip from "../Others/Tooltip";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useSelector } from "react-redux";
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { useTranslation } from "react-i18next";
 
 import {
   faChevronDown, faList, faTableCells, faMagnifyingGlass, faBrain,
@@ -21,7 +22,8 @@ import DemandIndicator from "./DemandIndicator";
 import type { ExtendedModelInfo } from "../../types/models";
 
 import {
-  faArrowUpAZ
+  faArrowUpAZ,
+  faCircleInfo
 } from "@fortawesome/free-solid-svg-icons";
 import { selectDefaultModel } from "../../Redux/reducers/userSettingsReducer";
 const sortOptions = [
@@ -37,6 +39,7 @@ const sortOptions = [
 
 export default function ModelSelectorSimple({ selectedModel, modelsData, onChange }: { selectedModel: Object | undefined, modelsData: ExtendedModelInfo[], onChange?: (model: ExtendedModelInfo) => void }) {
 
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [resultViewMode, setResultViewMode] = useState("list"); // list, expanded, grid
@@ -347,6 +350,22 @@ export default function ModelSelectorSimple({ selectedModel, modelsData, onChang
       {/** Dropdown Panel **/}
       <div className={`${dropdownOpen ? "" : "hidden"} bg-white dark:bg-bg_secondary_dark absolute z-50 mt-1 w-full rounded-2xl border border-slate-200 dark:border-gray-500 shadow-2xl dark:shadow-dark pb-4`}>
 
+        <div className="px-4 pt-4 pb-2">
+          <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs text-slate-600 dark:text-slate-200">
+            <FontAwesomeIcon icon={faCircleInfo} className="text-tertiary" />
+            <span>
+              {t("model_selector.docs_hint_text")}{" "}
+              <a
+                className="text-tertiary underline font-medium"
+                href="https://docs.hpc.gwdg.de/services/chat-ai/models/index.html"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                {t("model_selector.docs_hint_link")}
+              </a>
+            </span>
+          </div>
+        </div>
         {/** Search Controls **/}
         <div className="text-sm flex items-center gap-2 p-2 border-b border-slate-100 dark:border-gray-500 to-white">
           <div className="relative flex-1">

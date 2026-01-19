@@ -4,6 +4,8 @@ export default {
     loading: "Loading...",
     undo: "Undo",
     rename: "Rename",
+    create: "Create",
+    save: "Save",
     import: "Import Chat",
     export: "Export Chat",
     summarize: "Summarize conversation up to that point and replace it.",
@@ -37,6 +39,36 @@ export default {
   sidebar: {
     new_conversation: "New Conversation",
     import_persona: "Chat with Persona",
+    expand: "Expand",
+    extend: "Expand",
+    open_sidebar: "Open Sidebar",
+    close_sidebar: "Close Sidebar",
+    rename_tooltip: "Rename: {{title}}",
+    shortcut_new_conversation: "Ctrl + Shift + O",
+  },
+  folders: {
+    title: "Folders",
+    all: "All chats",
+    uncategorized: "Unsorted",
+    create_button: "New folder",
+    search_label: "Search",
+    search_placeholder: "Search chats by title",
+    search_no_results: 'No matches for "{{query}}"',
+    clear_search: "Clear search",
+    create_title: "Create Folder",
+    rename_title: "Rename Folder",
+    delete_title: "Delete Folder",
+    delete_description:
+      'Delete folder "{{name}}"? Conversations remain available and move to "Unsorted".',
+    name_label: "Folder name",
+    name_placeholder: "Enter folder name",
+    error_required: "Please enter a folder name.",
+    error_generic: "Could not complete the action. Please try again.",
+    move_title: "Move Conversation",
+    move_description: 'Select a folder for "{{title}}"',
+    move_action: "Move",
+    new_folder_prompt: "Need a new folder?",
+    create_inline: "Create",
   },
   // Settings panel
   settings: {
@@ -44,6 +76,7 @@ export default {
     tools_disabled: "Tools are disabled",
     web_search_enabled: "Web search is enabled",
     web_search_disabled: "Web search is disabled",
+    close_panel: "Close Settings",
     system_prompt_placeholder: "Enter the system prompt here",
     reset_default: "Reset default",
     default: "Default",
@@ -96,6 +129,7 @@ export default {
     sources: "Sources and References",
     references: "References",
     empty_message: "Your conversations are never stored on our servers",
+    untitled: "Untitled Conversation",
   },
   // Footer
   footer: {
@@ -106,7 +140,7 @@ export default {
     faq: "FAQ",
     contact: "Contact Us",
     about: "About",
-    copyright: "2025 GWDG  ©  All Rights Reserved",
+    copyright: "{{year}} GWDG  ©  All Rights Reserved",
     iso_certified: "ISO 27001 Certified",
   },
   // User Settings Modal
@@ -246,6 +280,10 @@ export default {
     top_p:
       "top_p is a slider from 0 to 1 which adjusts the total population of probabilities considered for the next token. A top_p of 0.1 would mean only the top 10% of cumulative probabilities is considered. Variating top_p has a similar effect on predictability and creativity as temperature.",
   },
+  model_selector: {
+    docs_hint_text: "Need help deciding which model fits best?",
+    docs_hint_link: "Read the model overview.",
+  },
   // Tour
   tour: {
     welcome_message: "Welcome to Chat AI",
@@ -298,6 +336,9 @@ export default {
       "You are using an external model or external features. Your messages will be processed outside of GWDG, and your custom settings will not be applied. Please refrain from entering confidential or personal data. External models can only be used by scientific employees for scientific work, provided that no personal data is entered.",
     arcana_usage:
       "Keep temperature at 0 and top_p at 0.05 for optimal arcana results",
+    arcana_create_collection_prefix:
+      "Create your own Document Collection",
+    arcana_create_collection_link: "here",
     web_search_usage:
       "PRIVACY WARNING: Your chat history may be sent to a search engine (e.g., Google)",
     mcp_usage: "PRIVACY WARNING: Your data may be sent to external servers.",

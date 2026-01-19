@@ -50,8 +50,22 @@ const ArcanaContainer = ({ localState, setLocalState }) => {
         (settings?.enable_tools ||
           settings.model?.input?.includes("arcana") ||
           false) && (
-          <div className="text-yellow-600 text-xs w-full select-none">
-            <Trans i18nKey="alert.arcana_usage" />
+          <div className="text-yellow-600 text-xs w-full select-none space-y-1">
+            <div>
+              <Trans i18nKey="alert.arcana_usage" />
+            </div>
+            <div>
+              {t("alert.arcana_create_collection_prefix") + " "}
+              <a
+                href="https://chat-ai.academiccloud.de/arcanas/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline font-semibold"
+              >
+                {t("alert.arcana_create_collection_link")}
+              </a>
+              .
+            </div>
           </div>
         )}
     </>

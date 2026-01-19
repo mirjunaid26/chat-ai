@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { useSelector } from "react-redux";
-import { getConversation, listConversationMetas } from "../db";
+import { getConversation, getFolder, listConversationMetas } from "../db";
 import { processContentItems } from "./sendMessage";
 
 export const getDefaultSettings = (userSettings = {}) => {
@@ -49,7 +49,7 @@ export const getDefaultSettings = (userSettings = {}) => {
   return mergedSettings ;
 };
 
-export const getDefaultConversation = (userSettings = {}) => {
+export const getDefaultConversation = (userSettings = {}, folderId = null) => {
   const settings = getDefaultSettings(userSettings);
   const now = Date.now();
   return {
@@ -77,6 +77,8 @@ export const getDefaultConversation = (userSettings = {}) => {
     settings: settings,
     createdAt: now,
     lastModified: now,
+    folderId,
+    hasFirstPrompt: false,
   };
 };
 
@@ -159,9 +161,12 @@ export const getExportData = async () => {
     console.log("Converting conversation ", conversationId);
 
     // Initialize conversation for export
+    const folderRow = conversation?.folderId ? await getFolder(conversation.folderId) : null;
     const processedConversation = {
       id: conversationId,
       title: conversation?.title || "Untitled Conversation",
+      folderId: conversation?.folderId ?? null,
+      folderName: folderRow?.name ?? null,
       messages: await processMessages(conversation.messages, true),
       ...conversation.settings,
     };
