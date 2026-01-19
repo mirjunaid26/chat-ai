@@ -8,6 +8,7 @@ export default {
     save: "Save",
     import: "Import Chat",
     export: "Export Chat",
+    summarize: "Summarize conversation up to that point and replace it.",
     clear: "Clear",
     abort: "Abort",
     send: "Send",
@@ -15,6 +16,8 @@ export default {
     share: "Share",
     delete: "Delete",
     cancel: "Cancel",
+    allow: "Allow",
+    disallow: "Disallow",
     refresh: "Refresh",
     notice: "Notice",
     disclaimer: "Disclaimer",
@@ -26,6 +29,11 @@ export default {
     backup_data: "Backup Data",
     skip_backup: "Skip Backup",
     upgrade_chat_ai: "Upgrade Chat AI",
+  },
+  feedback:{
+    thumbsup:"The response is good.",
+    thumbsdown: "The response is not so good.",
+    send: "Send a detailed feedback describing your observation."
   },
   // Sidebar
   sidebar: {
@@ -226,6 +234,7 @@ export default {
     export_settings: "Include model and options",
     export_files: "Include files",
     export_arcana: "Include Arcana details",
+    export_mcp_servers: "Include MCP server",
   },
   // Rename Conversation Modal
   rename_conversation: {
@@ -241,13 +250,16 @@ export default {
   // Share Settings Modal
   share_settings: {
     description:
-      "This feature creates a shareable link for your chosen model, system prompt, and settings. Any user who opens this link will be able to use the same configuration in their own conversations. Please note that your conversation history will not be shared.",
+      "This feature creates a shareable link containing your model, system prompt, and settings (including tool configuration). Anyone who opens this link can use the same setup in their own conversations. Your conversation history will not be shared.",
     warn_arcana:
       "Warning: Sharing arcana details may compromise data uploaded in the arcana.",
+    warn_mcp:
+      "Warning: Sharing an MCP server may route prompts or data to that server when MCP is used.",
   },
   // Help modals
   help: {
     title: "Help",
+    choiceproposer: "FIXME CHOICE",
     arcana:
       "Arcana is a unique feature of our service that empowers the LLM with specialized knowledge. When you enter a valid Arcana ID and its corresponding key, the LLM gains access to the knowledge contained within that Arcana. This enables the model to generate responses that are more informed and relevant to your needs. Leave the ID empty to use the model without any specialized knowledge.",
     mcp: "Enter the URL of your MCP (Model Context Protocol) Server (e.g., https://...). The MCP Server is a service that can provide the Chat AI with additional tools, data sources, or processing capabilities beyond its built‑in knowledge. By connecting to your specified MCP Server, the AI can interact with external systems, retrieve up‑to‑date or specialized information, and perform custom tasks according to the capabilities offered by that server.",
@@ -332,6 +344,8 @@ export default {
     mcp_usage: "PRIVACY WARNING: Your data may be sent to external servers.",
     arcana_export:
       "Warning: Exporting Arcana details to a file may compromise your private data, as it can be accessed by others.",
+    mcp_export:
+      "Warning: Exporting MCP server details to a file may expose external endpoints and can lead to data being sent to third-party servers.",
     model_offline:
       "The model you selected is currently offline. By pressing OK below, the model starts up and will be online in a few minutes. In the meantime, feel free to choose another model.",
     session_expired: "Your session has expired. Please press OK to refresh.",
@@ -349,6 +363,13 @@ export default {
     // External models
     settings_external:
       "These settings will not affect external (OpenAI) models.",
+    import_settings_title: "Review imported settings",
+    import_settings_intro:
+      "This shared settings link includes options that may send parts of your conversation to external services. Select what to import.",
+    import_web_search_disclaimer:
+      `When Web Search is enabled, the AI may generate search queries based on your message and conversation history and send them to a search engine (e.g., Google).\n\nOnly allow this if you are comfortable with your data being processed externally and you will not share any confidential, personal, or sensitive information while Web Search is active.`,
+    import_mcp_disclaimer:
+      `MCP servers can be hosted outside of GWDG. When enabled, the AI may send data to configured MCP servers to fulfill tool requests.\n\nOnly allow this if you trust the configured MCP servers and you will not share any confidential, personal, or sensitive information with them.`,
     web_search_disclaimer: `When web search is enabled, the AI may generate search queries based on your message and the full conversation history, and send them to a search engine (e.g., Google) to retrieve up-to-date information. This helps provide more accurate and current responses.\n\nBy clicking “I Understand,” you agree that your input may be processed in this way and acknowledge that you will not share any confidential, personal, or sensitive information while web search is active.`,
   },
   // Landing page

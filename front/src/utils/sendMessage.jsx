@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { editMemory, addMemory, selectAllMemories } from "../Redux/reducers/userSettingsReducer";
 import { chatCompletions } from "../apis/chatCompletions";
 import generateMemory from "../apis/generateMemory";
+import generateChoiceProposal from "../apis/generateChoiceProposal";
 import generateTitle from "../apis/generateTitle";
 import { loadFile, loadFileMeta, saveFile, updateConversation, updateConversationMeta } from "../db";
 import { getFileType, readFileAsBase64, readFileAsText } from "./attachments";
@@ -218,7 +219,7 @@ const sendMessage = async ({
       conversationForAPI.settings.tools = Object.entries(localState.settings.tools)
                 .filter(([_, enabled]) => enabled)
                 .map(([toolKey]) => ({ type: toolKey }));
-      console.log(conversationForAPI.settings.tools);
+      //console.log(conversationForAPI.settings.tools);
       // if (conversationForAPI.settings?.enable_web_search) {
       //   conversationForAPI.settings.tools.push({ type: "web_search" });
       //   conversationForAPI.settings.tools.push({ type: "fetch_url" });
@@ -260,7 +261,37 @@ const sendMessage = async ({
         ...conversationForAPI.messages,
       ]}
     }
+
+    // Ensure timeout value is within valid range
+    const timeoutAPI = (timeout >= 5000 && timeout <= 900000) ? timeout : 300000;
     
+    const isfeedbackMode = import.meta.env.VITE_FEEDBACK_MODE || false;
+    if(isfeedbackMode){
+      // add feedback information
+      if (conversationForAPI.settings?.tools == undefined){
+        conversationForAPI.settings.tools = {
+            enabled: true
+          }
+      }else{
+        conversationForAPI.settings.tools.enabled = true;
+      }
+      let message = localState.messages[localState.messages.length - 1];
+      if (Array.isArray(message.content)) {
+        if (message?.feedback){
+            conversationForAPI.settings.feedback = message.feedback;
+        }
+      }
+    }
+    
+    if(! setLocalState){   
+      // console.log(conversationForAPI);
+      // send the message WITHOUT changing the UI with any response
+      // TODO handle errors and print them to the user
+      for await (const chunk of chatCompletions(conversationForAPI, timeoutAPI)){
+        console.log(chunk);
+      }
+      return;
+    }
     // Pushing message into conversation history
     setLocalState((prev) => ({
       ...prev,
@@ -273,9 +304,6 @@ const sendMessage = async ({
       hasFirstPrompt: true,
       flush: true // Save to DB immediately
     }));
-
-    // Ensure timeout value is within valid range
-    const timeoutAPI = (timeout >= 5000 && timeout <= 900000) ? timeout : 300000;
 
     // Stream assistant response into localState
     async function getChatChunk(conversationId, messageId = null) {
@@ -507,6 +535,7 @@ const sendMessage = async ({
     let usage = null;
     let chatChunk = null;
     let meta = undefined;
+    let choicesProposed = [];
     try {
       // Get chat completion response
       chatChunk = await getChatChunk(conversationId);
@@ -523,10 +552,31 @@ const sendMessage = async ({
       notifyError(`${errorType}: ${errorMsg.toString()} ${errorStatus}`);
       console.error(error);
     } finally {
+      // Update choices
+      if(localState.settings.choiceProposer == 1){
+        try {
+          const content = localState.messages.map((message) => {
+          if (Array.isArray(message.content)){
+            return message.role + ": " + message.content[0].text;
+          }
+          });
+          content.push("assistant: " + responseContent[0].text)
+          console.log(content.join("\n\n"))
+
+          const response = await generateChoiceProposal(
+            content.join("\n\n")
+          );
+          choicesProposed = response;
+        } catch (error) {
+          console.error("Failed to generate choices: ", error.name, error.message);
+          notifyError("Failed to generate choices.");
+        }
+      }
+
       // Set loading to false
       setLocalState(prev => {
         if (prev.id !== conversationId) {
-          // Handle save when conversation is not activ, ideally save directly into DB (TODO)
+          // Handle save when conversation is not active, ideally save directly into DB (TODO)
           const messages = [...localState.messages,
             { role: "assistant", content: responseContent, loading: false, meta },
             { role: "user", content: [{ type: "text", text: "" }] },
@@ -538,6 +588,7 @@ const sendMessage = async ({
           );
           return prev;
         }
+        const choices = choicesProposed;
         const messages = [...prev.messages];
         messages[messages.length - 2] = {
           role: "assistant",
@@ -545,7 +596,7 @@ const sendMessage = async ({
           loading: false,
           meta
         };
-        return { ...prev, messages, flush: true };
+        return { ...prev, messages, choices, flush: true };
       });
     }
 

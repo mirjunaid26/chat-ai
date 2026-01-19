@@ -170,6 +170,7 @@ app.post("/chat/completions", async (req, res) => {
     enable_tools = null,
     tools = null,
     stream = true,
+    feedback = null
   } = req.body;
 
   const mcp_servers = req.body["mcp-servers"] || null;
@@ -216,6 +217,10 @@ app.post("/chat/completions", async (req, res) => {
       params.arcana = arcana;
     }
 
+    if (feedback){
+      params.feedback = feedback;
+    }
+
     // Handle tools and arcana
     if (enable_tools && !isExternalModel) {
       inference_service = "saia-openai-gateway";
@@ -243,6 +248,11 @@ app.post("/chat/completions", async (req, res) => {
           }
           if (tool.type === "audio_generation") {
             params.tools.push({type: "audio_generation"});
+          }
+          if (tool.type === "arcana") {
+            params.tools.push({type: "arcana_list_files"});
+            params.tools.push({type: "arcana_get_file_content"});
+            params.tools.push({type: "arcana_retrieve_knowledge"});
           }
           if (tool.type === "audio_transcription") {
             params.tools.push({type: "audio_transcription"});
@@ -293,7 +303,6 @@ app.post("/chat/completions", async (req, res) => {
         res.end(); // gracefully end if already streaming
       }
     });
-
     nodeStream.on('end', () => {
       // Ensure the connection is closed properly
       if (!res.writableEnded) {

@@ -15,6 +15,7 @@ import type {
   MessageRole,
   ContentItemInput,
   FolderRow
+  FeedbackRow
 } from "./dbTypes"
 
 // ---------- Dexie DB ----------
@@ -193,7 +194,8 @@ async function hydrateConversation(conversationId: string) {
     createdAt: m.createdAt,
     updatedAt: m.updatedAt,
     meta: m.meta,
-    content: contentByMessage.get(m.id) || []
+    content: contentByMessage.get(m.id) || [],
+    feedback: m.feedback
   }))
 
   return {
@@ -303,6 +305,7 @@ export async function updateConversation(
       createdAt?: number
       updatedAt?: number
       meta?: any
+      feedback?: FeedbackRow
     }>,
     lastModified?: number,
     folderId?: string | null,
@@ -338,7 +341,8 @@ export async function updateConversation(
         content: m.content ?? [],
         createdAt: m.createdAt ?? now,
         updatedAt: m.updatedAt,
-        meta: m.meta
+        meta: m.meta,
+        feedback: m.feedback ?? {}
       }));
       const hasFirstPromptValue = typeof data.hasFirstPrompt === 'boolean'
         ? data.hasFirstPrompt
@@ -384,7 +388,8 @@ export async function updateConversation(
           role: m.role,
           createdAt: m.createdAt,
           updatedAt: now,
-          meta: m.meta
+          meta: m.meta,
+          feedback : m.feedback
         };
         await db.messages.put(msgRow);
 

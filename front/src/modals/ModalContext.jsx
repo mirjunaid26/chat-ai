@@ -9,6 +9,7 @@ import HelpArcanaModal from "./Help/HelpArcanaModal";
 import HelpTemperatureModal from "./Help/HelpTemperatureModal";
 import HelpTopPModal from "./Help/HelpTopPModal";
 import HelpMemoryModal from "./Help/HelpMemoryModal";
+import HelpChoiceProposer from "./Help/HelpChoiceProposer";
 import UserSettingsModal from "./UserSettings/UserSettingsModal";
 import UserMemoryModal from "./UserSettings/UserMemoryModal";
 import ShareSettingsModal from "./Chat/ShareSettingsModal";
@@ -38,6 +39,7 @@ import HelpWebSearchModal from "./Help/HelpWebSearchModal";
 import WebSearchDisclaimer from "./Alert/WebSearchDisclaimer";
 import WelcomeModal from "./Help/WelcomeModal";
 import HelpMCPModal from "./Help/HelpMCPModal";
+import ImportSettingsDisclaimerModal from "./Alert/ImportSettingsDisclaimerModal";
 
 const ModalContext = createContext();
 
@@ -114,6 +116,9 @@ export function ModalProvider({ children }) {
       {modalType === "helpMemory" && (
         <HelpMemoryModal isOpen onClose={closeModal} {...modalProps} />
       )}
+      {modalType === "helpChoiceProposer" && (
+        <HelpChoiceProposer isOpen onClose={closeModal} {...modalProps} />
+      )}      
       {modalType === "helpSystemPrompt" && (
         <HelpSystemPromptModal isOpen onClose={closeModal} {...modalProps} />
       )}
@@ -176,6 +181,13 @@ export function ModalProvider({ children }) {
       )}
       {modalType === "disclaimerWebSearch" && (
         <WebSearchDisclaimer isOpen onClose={closeModal} {...modalProps} />
+      )}
+      {modalType === "importSettingsDisclaimer" && (
+        <ImportSettingsDisclaimerModal
+          isOpen
+          onClose={closeModal}
+          {...modalProps}
+        />
       )}
       {modalType === "migrate" && (
         <MigrateDataModal

@@ -8,6 +8,7 @@ export default {
     save: "Speichern",
     import: "Chat importieren",
     export: "Chat exportieren",
+    summarize: "Den bestehenden Chat zusammenfassen und ersetzen.",
     clear: "Löschen",
     abort: "Abbrechen",
     send: "Senden",
@@ -15,6 +16,8 @@ export default {
     share: "Teilen",
     delete: "Löschen",
     cancel: "Abbrechen",
+    allow: "Erlauben",
+    disallow: "Nicht erlauben",
     refresh: "Aktualisieren",
     notice: "Hinweis",
     disclaimer: "Haftungsausschluss",
@@ -26,6 +29,11 @@ export default {
     backup_data: "Daten sichern",
     skip_backup: "Backup überspringen",
     upgrade_chat_ai: "Chat AI aktualisieren",
+  },
+  feedback:{
+    thumbsup:"The response is good.",
+    thumbsdown: "The response is not so good.",
+    send: "Send a detailed feedback describing your observation."
   },
   // Sidebar
   sidebar: {
@@ -226,6 +234,7 @@ export default {
     export_settings: "Modell und Optionen einbeziehen",
     export_files: "Dateien einbeziehen",
     export_arcana: "Arcana-Details einbeziehen",
+    export_mcp_servers: "MCP-Server einbeziehen",
   },
   // Rename Conversation Modal
   rename_conversation: {
@@ -241,13 +250,16 @@ export default {
   // Share Settings Modal
   share_settings: {
     description:
-      "Mit dieser Funktion wird ein Link für das von Ihnen gewählte Modell, die Systemansage und die Einstellungen erstellt, der gemeinsam genutzt werden kann. Jeder Benutzer, der diesen Link öffnet, kann dieselbe Konfiguration in seinen eigenen Unterhaltungen verwenden. Bitte beachten Sie, dass Ihr Gesprächsverlauf nicht freigegeben wird.",
+      "Mit dieser Funktion wird ein Link erstellt, der Ihr Modell, den Systemprompt und Ihre Einstellungen (einschließlich Tool-Konfiguration) enthält. Jeder Benutzer, der diesen Link öffnet, kann dieselbe Konfiguration in seinen eigenen Unterhaltungen verwenden. Ihr Gesprächsverlauf wird nicht freigegeben.",
     warn_arcana:
       "Warnung: Die Weitergabe von arcana-Details kann die in arcana hochgeladenen Daten gefährden.",
+    warn_mcp:
+      "Warnung: Die Weitergabe eines MCP-Servers kann dazu führen, dass Eingaben oder Daten beim Einsatz von MCP an diesen Server gesendet werden.",
   },
   // Help modals
   help: {
     title: "Hilfe",
+    choiceproposer: "FIXME CHOICE",
     arcana:
       "Arcana ist eine einzigartige Funktion unseres Dienstes, die das LLM mit spezialisiertem Wissen ausstattet. Wenn Sie eine gültige Arcana-ID und den entsprechenden Schlüssel eingeben, erhält das LLM Zugriff auf das in dieser Arcana enthaltene Wissen. Dies ermöglicht es dem Modell, Antworten zu generieren, die besser informiert und relevanter für Ihre Bedürfnisse sind. Lassen Sie das Feld für die ID leer, um das Modell ohne spezialisiertes Wissen zu verwenden.",
     mcp: "Bitte geben Sie die URL Ihres MCP (Model Context Protocol) Servers ein (z. B. https://...). Der MCP-Server ist ein Dienst, der der Chat-AI zusätzliche Werkzeuge, Datenquellen oder Verarbeitungskapazitäten bereitstellen kann, die über ihr eingebautes Wissen hinausgehen. Durch die Verbindung mit dem angegebenen MCP-Server kann die KI mit externen Systemen interagieren, aktuelle oder spezialisierte Informationen abrufen und benutzerdefinierte Aufgaben entsprechend den angebotenen Funktionen ausführen.",
@@ -331,6 +343,8 @@ export default {
       "PRIVACY WARNUNG: Ihre Daten können an externe Server gesendet werden.",
     arcana_export:
       "Warnung: Das Exportieren von Arcana-Details in eine Datei kann Ihre privaten Daten gefährden, da sie für andere zugänglich sind.",
+    mcp_export:
+      "Warnung: Das Exportieren von MCP-Serverdaten in eine Datei kann externe Endpunkte offenlegen und dazu führen, dass Daten an Drittanbieter-Server gesendet werden.",
     model_offline:
       "Das von Ihnen ausgewählte Modell ist derzeit offline. Durch das Anklicken von OK unten startet das Modell und wird in wenigen Minuten online sein. In der Zwischenzeit können Sie gerne ein anderes Modell auswählen.",
     session_expired:
@@ -350,6 +364,13 @@ export default {
     // External models
     settings_external:
       "Diese Einstellungen wirken sich nicht auf externe (OpenAI) Modelle aus.",
+    import_settings_title: "Importierte Einstellungen prüfen",
+    import_settings_intro:
+      "Dieser geteilte Einstellungs-Link enthält Optionen, die Teile Ihrer Unterhaltung an externe Dienste senden können. Wählen Sie aus, was importiert werden soll.",
+    import_web_search_disclaimer:
+      `Wenn die Websuche aktiviert ist, kann die KI auf Grundlage Ihrer Nachricht und des Gesprächsverlaufs Suchanfragen erstellen und diese an eine Suchmaschine (z. B. Google) senden.\n\nErlauben Sie dies nur, wenn Sie damit einverstanden sind, dass Ihre Daten extern verarbeitet werden, und wenn Sie während der aktiven Websuche keine vertraulichen, persönlichen oder sensiblen Informationen teilen.`,
+    import_mcp_disclaimer:
+      `MCP-Server können außerhalb der GWDG betrieben werden. Wenn aktiviert, kann die KI Daten an konfigurierte MCP-Server senden, um Tool-Anfragen auszuführen.\n\nErlauben Sie dies nur, wenn Sie den konfigurierten MCP-Servern vertrauen und keine vertraulichen, persönlichen oder sensiblen Informationen mit ihnen teilen.`,
     web_search_disclaimer: `Wenn die Websuche aktiviert ist, kann die KI auf Grundlage Ihrer Nachricht und des gesamten Gesprächsverlaufs Suchanfragen erstellen und diese an eine Suchmaschine (z. B. Google) senden, um aktuelle Informationen abzurufen. Dies hilft, genauere und aktuellere Antworten bereitzustellen.\n\nDurch Klicken auf „Ich verstehe“ stimmen Sie zu, dass Ihre Eingaben auf diese Weise verarbeitet werden, und bestätigen, dass Sie während der aktiven Websuche keine vertraulichen, persönlichen oder sensiblen Informationen teilen.`,
   },
   // Landing page
