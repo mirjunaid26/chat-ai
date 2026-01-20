@@ -1,5 +1,12 @@
 # Changelog 
 
+## Version: v0.9.2 (22.01.2026)
+Highlights:
+- Folders and search for organizing and finding conversations
+- "Suggest prompts" option provides selection of follow-up messages with each model response
+- Developer can individually enable/disable UI modules, including "tools", "memory", "suggest prompts"
+- Fixed and improved several tools, including arcana, web_search, and audio_generation
+
 ## Version: v0.9.1 (15.12.2025)
 Highlights:
 - Storing and denoting model name as well as token usage for each message

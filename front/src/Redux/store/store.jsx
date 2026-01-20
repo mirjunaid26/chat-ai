@@ -16,16 +16,14 @@ const persistConfig = {
     "interface_settings",
     "last_conversation",
     "user_settings",
-    "version",
     "migration_data",
   ],
-  version: 1,
+  version: 2,
   migrate: createMigrate(migrations, { debug: true })
 };
 
 const getDefaultState = () => {
   return {
-    version: 4,
     last_conversation: null,
     interface_settings: {
       dark_mode: false,

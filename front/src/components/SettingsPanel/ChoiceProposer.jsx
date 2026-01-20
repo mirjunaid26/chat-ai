@@ -1,3 +1,4 @@
+import { Trans, useTranslation } from "react-i18next";
 import { useState } from "react";
 import { HelpCircle } from "lucide-react";
 import { useModal } from "../../modals/ModalContext";
@@ -7,7 +8,7 @@ export default function ChoiceProposer({ localState, setLocalState }) {
   return (
     <div className="w-full flex gap-4">
       <div className="flex-shrink-0 flex items-center gap-2 select-none">
-        <p className="text-sm">ChoiceProposer</p>
+        <p className="text-sm">Prompt choices</p>
         <HelpCircle
           className="h-[16px] w-[16px] cursor-pointer text-[#009EE0]"
           alt="help"
@@ -19,7 +20,7 @@ export default function ChoiceProposer({ localState, setLocalState }) {
           {/* Off Option */}
           <div
             className={`choiceProposer-option-off flex-1 p-2 text-center cursor-pointer transition-all duration-200 select-none ${
-              localState.settings.choiceProposer === 0
+              !localState.settings?.choiceProposer
                 ? "bg-tertiary text-white"
                 : "text-tertiary hover:bg-gray-100 dark:hover:bg-gray-800"
             }`}
@@ -39,7 +40,7 @@ export default function ChoiceProposer({ localState, setLocalState }) {
           {/* On */}
           <div
             className={`choiceProposer-option-on flex-1 p-2 text-center cursor-pointer transition-all duration-200 select-none border-l border-r dark:border-border_dark ${
-              localState.settings.choiceProposer === 1
+              localState.settings?.choiceProposer === 1
                 ? "bg-tertiary text-white"
                 : "text-tertiary hover:bg-gray-100 dark:hover:bg-gray-800"
             }`}

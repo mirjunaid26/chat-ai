@@ -67,5 +67,10 @@ export const migrations = {
     
     return state;
   },
-  // Future migrations here (e.g., 2: (state) => {...})
+  2: (state) => {
+    state.interface_settings = {};
+    state.interface_settings.show_tour = true;
+    console.log("Migrating to 2 really")
+  }
+  // Future migrations here (e.g., 3: (state) => {...})
 };

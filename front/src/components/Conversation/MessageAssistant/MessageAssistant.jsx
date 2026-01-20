@@ -11,6 +11,7 @@ import { useNavigate } from "react-router";
 import { createConversation, newId, saveFile, loadFile } from "../../../db";
 import { useToast } from "../../../hooks/useToast";
 import FeedbackButtons from "./FeedbackButtons";
+import ForkButton from "./ForkButton";
 
 // Constants
 const MAX_HEIGHT = 200;
@@ -445,14 +446,7 @@ export default React.memo(({ localState, setLocalState, message_index }) => {
                     <MetaBox meta={message.meta} /> 
                   )}
                   <EditButton setEditMode={setEditMode} />
-                  <button
-                    onClick={handleForkConversation}
-                    disabled={forking}
-                    title="Fork conversation"
-                    className="h-[22px] w-[22px] cursor-pointer disabled:opacity-40"
-                  >
-                    <GitFork className="h-[22px] w-[22px] text-[#009EE0]" />
-                  </button>
+                  <ForkButton handleForkConversation={handleForkConversation} />
                   <CopyButton message={message} />
                 </div>
               </div>

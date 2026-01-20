@@ -259,7 +259,7 @@ export default {
   // Help modals
   help: {
     title: "Help",
-    choiceproposer: "FIXME CHOICE",
+    choiceproposer: "When set to \"On\", the model will propose a selection of relevant follow-up messages with its response, in order to assist you in continuing the conversation.",
     arcana:
       "Arcana is a unique feature of our service that empowers the LLM with specialized knowledge. When you enter a valid Arcana ID and its corresponding key, the LLM gains access to the knowledge contained within that Arcana. This enables the model to generate responses that are more informed and relevant to your needs. Leave the ID empty to use the model without any specialized knowledge.",
     mcp: "Enter the URL of your MCP (Model Context Protocol) Server (e.g., https://...). The MCP Server is a service that can provide the Chat AI with additional tools, data sources, or processing capabilities beyond its built‑in knowledge. By connecting to your specified MCP Server, the AI can interact with external systems, retrieve up‑to‑date or specialized information, and perform custom tasks according to the capabilities offered by that server.",
@@ -292,15 +292,15 @@ export default {
     description:
       "Click the button below to begin the guided tour and explore the new user interface.",
     prompt:
-      "You can simply type a message here to start a conversation with Chat AI. You can attach files to your message; the model will use it if it understands the file type.",
+      "Simply enter your message here to start the conversation with Chat AI. You can attach files; the model will use it if it supports the file type.",
     model:
-      "Here you can select the model to chat with. Each model has its unique capabilities and limitations.",
+      "Here you can select the model to chat with. Each model has its own characteristics, capabilities and limitations.",
     sidebar:
-      "In the sidebar you can add, export, delete, and switch conversations. You can import and export conversations to your device, or choose a Persona to chat with.",
+      "Create, remove, import, export, remove, search, and switch between conversations here. Organize your conversations with folders, and chat with pre-defined personas, if you like.",
     settings:
-      "In the settings panel, you can adjust the system prompt, temperature, and top_p. You can specify Chat AI's memory settings, enable and select GWDG tools, including arcana, image generation, web search, and more! Some tools may be available only to certain users.",
+      "Here you can adjust the conversation settings, including the system prompt, temperature, top_p, and memory settings. Ask the model to suggest follow-up prompts, and use GWDG tools, including arcana, image generation, web search, and more! Tools may not work with all models.",
     profile:
-      "Just below the settings button, this button will open your user profile, where you can set your preferences, manage memories, and export or clear your data.",
+      "This button will open your user profile, where you can set your preferences, manage saved memories, and export or clear your data.",
     interface:
       "In this corner you can switch the theme and language of Chat AI.",
     memory: {

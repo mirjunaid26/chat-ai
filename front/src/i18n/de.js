@@ -259,7 +259,7 @@ export default {
   // Help modals
   help: {
     title: "Hilfe",
-    choiceproposer: "FIXME CHOICE",
+    choiceproposer: "Wenn auf \"On\" gestellt, schlägt das Modell eine Auswahl relevanter Folgeantworten zusammen mit seiner Antwort vor, um Sie bei der Fortführung des Gesprächs zu unterstützen.",
     arcana:
       "Arcana ist eine einzigartige Funktion unseres Dienstes, die das LLM mit spezialisiertem Wissen ausstattet. Wenn Sie eine gültige Arcana-ID und den entsprechenden Schlüssel eingeben, erhält das LLM Zugriff auf das in dieser Arcana enthaltene Wissen. Dies ermöglicht es dem Modell, Antworten zu generieren, die besser informiert und relevanter für Ihre Bedürfnisse sind. Lassen Sie das Feld für die ID leer, um das Modell ohne spezialisiertes Wissen zu verwenden.",
     mcp: "Bitte geben Sie die URL Ihres MCP (Model Context Protocol) Servers ein (z. B. https://...). Der MCP-Server ist ein Dienst, der der Chat-AI zusätzliche Werkzeuge, Datenquellen oder Verarbeitungskapazitäten bereitstellen kann, die über ihr eingebautes Wissen hinausgehen. Durch die Verbindung mit dem angegebenen MCP-Server kann die KI mit externen Systemen interagieren, aktuelle oder spezialisierte Informationen abrufen und benutzerdefinierte Aufgaben entsprechend den angebotenen Funktionen ausführen.",
@@ -290,18 +290,18 @@ export default {
     skip_tour: "Tour überspringen",
     description:
       "Klicken Sie auf die Schaltfläche unten, um die geführte Tour zu starten und die neue Benutzeroberfläche zu erkunden.",
-    prompt:
-      "Sie können hier einfach eine Nachricht eingeben, um ein Gespräch mit Chat AI zu beginnen. Sie können Dateien an Ihre Nachricht anhängen; das Modell wird sie verwenden, wenn es den Dateityp verstehen kann.",
+    prompt: 
+      "Geben Sie hier einfach Ihre Nachricht ein, um die Unterhaltung mit Chat AI zu starten. Sie können Dateien anhängen; das Modell wird sie verwenden, sofern der Dateityp unterstützt wird.",
     model:
-      "Hier können Sie das Modell auswählen, mit dem Sie chatten möchten. Jedes Modell hat seine eigenen Fähigkeiten und Einschränkungen.",
+      "Hier können Sie das Modell auswählen, mit dem Sie chatten möchten. Jedes Modell hat seine eigenen Eigenschaften, Fähigkeiten und Einschränkungen.", 
     sidebar:
-      "In der Seitenleiste können Sie Gespräche hinzufügen, exportieren, löschen und zwischen ihnen wechseln. Sie können Gespräche auf Ihr Gerät importieren und exportieren oder eine Persona zum Chatten auswählen.",
+      "Hier können Sie Unterhaltungen erstellen, löschen, importieren, exportieren, durchsuchen und zwischen ihnen wechseln. Organisieren Sie Ihre Unterhaltungen in Ordnern und chatten Sie auf Wunsch mit vordefinierten Personas.",
     settings:
-      "Im Einstellungsbereich können Sie den System‑Prompt, die Temperatur und top_p anpassen. Zudem können Sie die Speichereinstellungen der Chat‑KI festlegen sowie GWDG-Tools aktivieren und auswählen, darunter Arcana, Bildgenerierung, Websuche und mehr. Einige Werkzeuge sind möglicherweise nur für bestimmte Nutzer verfügbar.",
+      "Hier können Sie die Unterhaltungseinstellungen anpassen, einschließlich System-Prompt, Temperatur, Top_p und Speichereinstellungen. Lassen Sie sich vom Modell Folge-Prompts vorschlagen und nutzen Sie GWDG‑Tools wie Arcana, Bildgenerierung, Websuche und mehr. Tools funktionieren möglicherweise nicht mit allen Modellen.",
     profile:
-      "Direkt unter der Schaltfläche für die Einstellungen befindet sich diese Schaltfläche, mit der Sie Ihr Benutzerprofil öffnen können. Dort können Sie Ihre Präferenzen festlegen, Erinnerungen verwalten sowie Ihre Daten exportieren oder löschen.",
+      "Diese Schaltfläche öffnet Ihr Benutzerprofil, in dem Sie Ihre Einstellungen festlegen, gespeicherte Erinnerungen verwalten sowie Ihre Daten exportieren oder löschen können.",
     interface:
-      "In dieser Ecke können Sie das Design und die Sprache von Chat AI ändern.",
+      "In dieser Ecke können Sie das Design und die Sprache von Chat AI wechseln.",
     memory: {
       off: "Memory - None: Chat AI erinnert sich an nichts aus früheren Gesprächen, wie zuvor.",
       recall:
