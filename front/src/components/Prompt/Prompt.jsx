@@ -31,7 +31,7 @@ export default function Prompt({
   const attachments = lastMessage.content.slice(1);
   
   // Update partial local state while preserving other values
-  const savePrompt = () => {
+  const savePrompt = (nextPrompt = prompt, { clearChoices = false } = {}) => {
     setIgnoreChanges(true);
     setLocalState((prev) => {
       const messages = [...prev.messages]; // shallow copy
@@ -39,12 +39,16 @@ export default function Prompt({
         role: "user",
         content: [ { // Replace first content item
             type: "text",
-            text: prompt
+            text: nextPrompt
           }, // Keep other content items
           ...prev.messages[messages.length - 1].content.slice(1)
         ]
       };
-      return { ...prev, messages };
+      return {
+        ...prev,
+        messages,
+        ...(clearChoices ? { choices: [] } : {}),
+      };
     });
   };
 
@@ -72,11 +76,12 @@ export default function Prompt({
   };
   
   // Handle form submission with prompt and files
-  const handleSend = async (event) => {
+  const handleSend = async (event, nextPrompt) => {
       event.preventDefault();
-      if (prompt?.trim() === "" && attachments.length === 0) return;
+      const promptToSend = typeof nextPrompt === "string" ? nextPrompt : prompt;
+      if (promptToSend?.trim() === "" && attachments.length === 0) return;
       debouncedSave.cancel();
-      savePrompt();
+      savePrompt(promptToSend, { clearChoices: true });
       setShouldSend(true);
   };
   
@@ -95,7 +100,6 @@ export default function Prompt({
             handleSend={handleSend}
             handleChange={handleChange}
             prompt={prompt}
-            setPrompt={setPrompt}
           />
           {/* Buttons Section */}
           <div className="px-3 py-2 w-full h-fit flex justify-between items-center bg-white dark:bg-bg_secondary_dark rounded-b-2xl relative">

@@ -1,11 +1,8 @@
 
-import { useEffect, useRef, useState } from "react";
-
-import Tooltip from "../Others/Tooltip";
-import { Trans, useTranslation } from "react-i18next";
+import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useToast } from "../../hooks/useToast";
-import { useDebounce } from "../../hooks/useDebounce";
 
 import { useAttachments } from "../../hooks/useAttachments";
 
@@ -18,16 +15,19 @@ export default function PromptTextArea({
     handleSend,
     handleChange,
     prompt,
-    setPrompt
 }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const textareaRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const { notifySuccess, notifyError } = useToast();
   const { addAttachments, pasteAttachments } = useAttachments();
   
   // Prompt is actually the last message's first content
-  const attachments = localState.messages[localState.messages.length - 1].content.slice(1);
+  const lastMessage = localState?.messages?.[localState.messages.length - 1];
+  const attachments = Array.isArray(lastMessage?.content)
+    ? lastMessage.content.slice(1)
+    : [];
+  const choices = Array.isArray(localState?.choices) ? localState.choices : [];
 
   const adjustHeight = () => {
     if (textareaRef.current) {
@@ -59,10 +59,6 @@ export default function PromptTextArea({
     });
   };
 
-  if (! localState.hasOwnProperty("choices")){
-    localState.choices = [];
-  }
-
   return (
     <div
     className="drag-drop-container relative"
@@ -79,33 +75,43 @@ export default function PromptTextArea({
       >
         Drop Here
       </span>
-    { localState.choices.length > 0 &&
-    <div className="group flex justify-between w-full answer-choice">
-      <div className="flex items-center justify-end opacity-60 group-hover:opacity-100 transition-opacity duration-300">
-        {/* Render Selector on the bottom left*/}
-          {localState.choices.map((choice) => (
+    {choices.length > 0 && (
+      <div className="px-5 pt-4 pb-2 choice-bar-enter">
+        <div
+          className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-x-visible"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
+          {choices.map((choice, index) => (
             <button
-              key={choice}
+              key={`${index}-${choice}`}
+              type="button"
               onClick={(event) => {
-                setPrompt(choice);
-                event.preventDefault(); 
-                /* FIXME, not working with single click, yet probably due to setting prompt externally */
-                handleSend(event);
-               }
-              }
-              className="px-2 text-xs font-medium transition-all duration-300 ease-in-out min-w-[60px] cursor-pointer select-none text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                event.preventDefault();
+                event.stopPropagation();
+                handleSend(event, choice);
+              }}
+              title={choice}
+              className="shrink-0 max-w-[75vw] sm:max-w-[22rem]
+                         inline-flex items-center cursor-pointer rounded-full border border-gray-200 dark:border-gray-700 choice-chip-enter
+                         bg-gray-50 dark:bg-gray-900/30 px-3 py-2 text-xs font-medium
+                         text-gray-700 dark:text-gray-200
+                         hover:bg-gray-100 dark:hover:bg-gray-800
+                         active:scale-95 transition"
+              style={{ animationDelay: `${Math.min(index, 6) * 45}ms` }}
             >
-              {choice}
+              <span className="truncate">{choice}</span>
             </button>
           ))}
         </div>
-      </div>    
-      }
+      </div>
+    )}
       {/* Actual text area */}
       <textarea
           autoFocus
           ref={textareaRef}
-          className="p-5 transition-opacity duration-300 ease-in-out outline-none text-base rounded-t-2xl w-full dark:text-white text-black bg-white dark:bg-bg_secondary_dark overflow-y-auto"
+          className={`p-5 transition-opacity duration-300 ease-in-out outline-none text-base w-full dark:text-white text-black bg-white dark:bg-bg_secondary_dark overflow-y-auto ${
+            choices.length > 0 ? "" : "rounded-t-2xl"
+          }`}
           value={prompt}
           name="prompt"
           autoComplete="off"
