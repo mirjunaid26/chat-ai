@@ -224,27 +224,19 @@ const sendMessage = async ({
       conversationForAPI.settings.tools = Object.entries(localState.settings.tools)
                 .filter(([_, enabled]) => enabled)
                 .map(([toolKey]) => ({ type: toolKey }));
-      //console.log(conversationForAPI.settings.tools);
-      // if (conversationForAPI.settings?.enable_web_search) {
-      //   conversationForAPI.settings.tools.push({ type: "web_search" });
-      //   conversationForAPI.settings.tools.push({ type: "fetch_url" });
-      // }
-      // If arcana id exists and isn't empty string ""
       if (conversationForAPI.settings?.arcana?.id && conversationForAPI.settings.arcana.id !== "") {
         conversationForAPI.settings.arcana.limit = 3;
       }
+      // Always inject audio_transcription tool for now
       conversationForAPI.settings.tools.push({ type: "audio_transcription" });
-      // Always enable image and audio generation for now
-      // conversationForAPI.settings.tools.push({ type: "image_generation" });
-      // conversationForAPI.settings.tools.push({ type: "image_modify" });
-      // conversationForAPI.settings.tools.push({ type: "audio_generation" });
-      // conversationForAPI.settings.tools.push({ type: "runRscript" }); // Disabled for now
     } else {
       delete conversationForAPI.settings.tools;
     }
 
-    if (!isArcanaSupported) delete conversationForAPI.settings?.arcana;
-
+    // Remove MCP and arcana if not enabled
+    if (!localState.settings?.enable_tools || !localState.settings.tools.mcp) delete conversationForAPI.settings.mcp_servers;
+    if (!localState.settings?.enable_tools || !localState.settings.tools.arcana) delete conversationForAPI.settings.arcana;
+      
     // Clean conversation for API call
     conversationForAPI = {
       ...conversationForAPI,
@@ -287,7 +279,7 @@ const sendMessage = async ({
       }
     }
     
-    if(! setLocalState){   
+    if(!setLocalState){   
       // console.log(conversationForAPI);
       // send the message WITHOUT changing the UI with any response
       // TODO handle errors and print them to the user

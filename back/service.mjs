@@ -249,7 +249,7 @@ app.post("/chat/completions", async (req, res) => {
           if (tool.type === "audio_generation") {
             params.tools.push({type: "audio_generation"});
           }
-          if (tool.type === "arcana") {
+          if (tool.type === "arcana" && (!params.arcana || !params.arcana.id)) {
             params.tools.push({type: "arcana_list_files"});
             params.tools.push({type: "arcana_get_file_content"});
             params.tools.push({type: "arcana_retrieve_knowledge"});

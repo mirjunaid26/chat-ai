@@ -12,6 +12,7 @@ import {
   FolderPlus,
   MoreVertical,
   Trash2,
+  Triangle,
 } from "lucide-react";
 import { assignConversationToFolder, useConversationList, useFolderList } from "../../db";
 import { useModal } from "../../modals/ModalContext";
@@ -46,6 +47,7 @@ export default function SidebarContent({
   const { isDesktop, isTouch } = useWindowSize();
   const conversations = useConversationList() || [];
   const folders = useFolderList() || [];
+  const [foldersExpanded, setFoldersExpanded] = useState(true);
   const folderMap = useMemo(
     () => new Map(folders.map((folder) => [folder.id, folder.name])),
     [folders]
@@ -485,9 +487,9 @@ export default function SidebarContent({
             </button>
 
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              {/* <label className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 <Trans i18nKey="folders.search_label" />
-              </label>
+              </label> */}
               <div className="relative">
                 <input
                   type="text"
@@ -520,35 +522,67 @@ export default function SidebarContent({
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           <div className="px-3 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800 space-y-1 bg-white dark:bg-bg_secondary_dark">
-            <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400 pb-2">
-              <span>{t("folders.title")}</span>
+            {/* Header (clickable) */}
+            <button
+              type="button"
+              onClick={() => setFoldersExpanded((v) => !v)}
+              className="w-full flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              <div className="justify-start flex items-center gap-2" >
+                <span>{t("folders.title")}</span>
+              <Triangle
+                className={`transition-transform duration-200 h-[9px] w-[9px] ${
+                  foldersExpanded ? "rotate-180" : "rotate-90"
+                }`}
+              >
+                ▾
+              </Triangle>
+              
+              </div>
+            {/* Chevron */}
+              
+            <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={handleCreateFolder}
+                onClick={(e) => {
+                  e.stopPropagation(); // prevent collapsing when clicking +
+                  handleCreateFolder();
+                }}
                 className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition"
                 aria-label={t("folders.create_button")}
               >
                 <FolderPlus className="w-4 h-4" />
               </button>
             </div>
-            {renderFolderRow({
-              id: ALL_FOLDERS,
-              label: t("folders.all"),
-              countKey: ALL_FOLDERS,
-            })}
-            {folders.map((folder) =>
-              renderFolderRow({
-                id: folder.id,
-                label: folder.name,
-                countKey: folder.id,
-                canEdit: true,
-                folder,
-              })
-            )}
+            </button>
+            <div
+              className={`
+                overflow-hidden
+                transition-all duration-300 ease-in-out
+                ${foldersExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}
+              `}
+            >
+              <div className="space-y-1 pt-1">
+              {renderFolderRow({
+                id: ALL_FOLDERS,
+                label: t("folders.all"),
+                countKey: ALL_FOLDERS,
+              })}
+              {folders.map((folder) =>
+                renderFolderRow({
+                  id: folder.id,
+                  label: folder.name,
+                  countKey: folder.id,
+                  canEdit: true,
+                  folder,
+                })
+              )}
+              </div>
+            </div>
           </div>
 
           {/* Conversations List */}
-          <div className="mx-3 pt-4 space-y-1 pb-6">
+          <div className="mx-3 pt-0 space-y-1 pb-6">
             {noSearchResults && (
               <div className="text-center text-xs text-gray-500 dark:text-gray-400 py-4">
                 <Trans i18nKey="folders.search_no_results" values={{ query: searchQuery }} />

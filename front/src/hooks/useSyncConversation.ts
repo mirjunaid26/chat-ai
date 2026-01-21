@@ -418,6 +418,16 @@ export function useSyncConversation({
         setLocalState( updatedConversation );
         return;
       }
+      // Sanity check
+      if (!(conversation?.messages?.length >= 2)) {
+        console.log("Sanitizing conversation...");
+        const updatedConversation = {
+          ...conversation,
+          messages: getDefaultConversation().messages
+        }
+        setLocalState( updatedConversation );
+        return;
+      }
       setLocalState(conversation);
     })();
   }, [conversationId]);

@@ -52,7 +52,7 @@ export default {
     uncategorized: "Unsorted",
     create_button: "New folder",
     search_label: "Search",
-    search_placeholder: "Search chats by title",
+    search_placeholder: "Search by title",
     search_no_results: 'No matches for "{{query}}"',
     clear_search: "Clear search",
     create_title: "Create Folder",
@@ -348,7 +348,7 @@ export default {
       "Warning: Exporting MCP server details to a file may expose external endpoints and can lead to data being sent to third-party servers.",
     model_offline:
       "The model you selected is currently offline. By pressing OK below, the model starts up and will be online in a few minutes. In the meantime, feel free to choose another model.",
-    session_expired: "Your session has expired. Please press OK to refresh.",
+    session_expired: "Your session has expired. Please refresh the webpage.",
     unsent_files:
       "You have attached files that will be lost. Are you sure you want to leave?",
     unprocessed_files: "Please process or remove the attached PDF to continue.",

@@ -52,7 +52,7 @@ export default {
     uncategorized: "Ohne Ordner",
     create_button: "Neuer Ordner",
     search_label: "Suche",
-    search_placeholder: "Chats nach Titel durchsuchen",
+    search_placeholder: "nach Titel durchsuchen",
     search_no_results: 'Keine Treffer für "{{query}}"',
     clear_search: "Suche löschen",
     create_title: "Ordner erstellen",
@@ -348,7 +348,7 @@ export default {
     model_offline:
       "Das von Ihnen ausgewählte Modell ist derzeit offline. Durch das Anklicken von OK unten startet das Modell und wird in wenigen Minuten online sein. In der Zwischenzeit können Sie gerne ein anderes Modell auswählen.",
     session_expired:
-      "Ihre Sitzung ist abgelaufen. Bitte drücken Sie zum Aktualisieren OK.",
+      "Ihre Sitzung ist abgelaufen. Bitte aktualisieren Sie die Webseite.",
     unsent_files:
       "Sie haben Dateien angehängt, die verloren gehen werden. Sind Sie sicher, dass Sie gehen wollen?",
     unprocessed_files:

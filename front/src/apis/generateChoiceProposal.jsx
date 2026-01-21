@@ -15,7 +15,6 @@ export default async function generateChoiceProposal(history) {
     If the last message asks to provide a choice, include these options as favorite answer choices.
     `;
 
-
   const schema = {
     $schema: "http://json-schema.org/draft-04/schema#",
     type: "object",
@@ -24,7 +23,9 @@ export default async function generateChoiceProposal(history) {
         type: "array",
         "items": {
           "type" : "string"
-        }
+        },
+        minItems: 1,
+        maxItems: 3
       }
     },
     required: ["proposals"],
@@ -68,7 +69,7 @@ export default async function generateChoiceProposal(history) {
     const response = await openai.chat.completions.create(params);
     if (!response) throw new Error(response.statusText);
     const proposals = JSON.parse(response?.choices[0]?.message?.content)["proposals"] || []
-    return proposals.sort();
+    return proposals.sort().slice(0, 3);
   } catch (error) {
     // Handle AbortError specifically
     if (error.name === "AbortError") {
