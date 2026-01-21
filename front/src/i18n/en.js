@@ -326,6 +326,8 @@ export default {
       "Caution! Clearing data will erase all your conversations, history, and settings. Are you sure?",
     clear_messages:
       "Are you sure you want to erase all messages in this conversation?",
+    summarize_replace:
+      "This will replace your current chat history with a summary. Your existing messages will be removed from this conversation. Continue?",
     no: "No, go back",
     yes: "Yes, clear everything",
     system_prompt_empty: "System prompt is empty. Model may not respond.",

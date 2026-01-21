@@ -2,7 +2,7 @@ import { Shrink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSendMessage } from "../../hooks/useSendMessage";
 import Tooltip from "../Others/Tooltip";
-import i18n from "i18next";
+import { useModal } from "../../modals/ModalContext";
 
 export default function SummaryButton({
   localState,
@@ -10,6 +10,7 @@ export default function SummaryButton({
 }) {
   const sendMessage = useSendMessage();
   const { t } = useTranslation();
+  const { openModal } = useModal();
   const loading = localState.messages[localState.messages.length - 2]?.role === "assistant"
     ? localState.messages[localState.messages.length - 2]?.loading || false
     : false;
@@ -36,11 +37,15 @@ export default function SummaryButton({
     });
   };
 
+  const handleClick = () => {
+    openModal("summarizeReplace", { onConfirm: handleSummary });
+  };
+
   return (
     <Tooltip text={t("common.summarize")}>
       <button
         className="h-[26px] w-[26px] cursor-pointer"
-        onClick={handleSummary}
+        onClick={handleClick}
         disabled={loading}
       >
         <Shrink className="cursor-pointer h-[26px] w-[26px] text-[#009EE0] hover:text-blue-600 transition-colors" />
