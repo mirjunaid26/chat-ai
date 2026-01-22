@@ -639,7 +639,7 @@ export function useConversationList() {
   const list = useLiveQuery(
     async () => {
       const rows = await db.conversations.orderBy('createdAt').reverse().toArray()
-      return rows.filter(conv => conv?.hasFirstPrompt !== false)
+      return rows //.filter(conv => conv?.hasFirstPrompt !== false)
     },
   [],
   [] as ConversationRow[]

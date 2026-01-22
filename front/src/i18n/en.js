@@ -60,7 +60,7 @@ export default {
     rename_title: "Rename Folder",
     delete_title: "Delete Folder",
     delete_description:
-      'Delete folder "{{name}}"? Conversations remain available and move to "Unsorted".',
+      'Delete folder "{{name}}"? Conversations remain available and move to "All chats".',
     name_label: "Folder name",
     name_placeholder: "Enter folder name",
     error_required: "Please enter a folder name.",
@@ -68,7 +68,7 @@ export default {
     move_title: "Move Conversation",
     move_description: 'Select a folder for "{{title}}"',
     move_action: "Move",
-    new_folder_prompt: "Need a new folder?",
+    new_folder_prompt: "Create new folder",
     create_inline: "Create",
   },
   // Settings panel

@@ -60,7 +60,7 @@ export default {
     rename_title: "Ordner umbenennen",
     delete_title: "Ordner löschen",
     delete_description:
-      'Ordner "{{name}}" löschen? Unterhaltungen bleiben erhalten und erscheinen unter "Ohne Ordner".',
+      'Ordner "{{name}}" löschen? Unterhaltungen bleiben erhalten und erscheinen unter "Alle Chats".',
     name_label: "Ordnername",
     name_placeholder: "Ordnername eingeben",
     error_required: "Bitte einen Ordnernamen eingeben.",
@@ -68,7 +68,7 @@ export default {
     move_title: "Konversation verschieben",
     move_description: 'Ordner für "{{title}}" auswählen',
     move_action: "Verschieben",
-    new_folder_prompt: "Neuen Ordner anlegen?",
+    new_folder_prompt: "Neuen Ordner anlegen",
     create_inline: "Erstellen",
   },
   // Settings panel

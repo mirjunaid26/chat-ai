@@ -252,7 +252,7 @@ export default function SidebarContent({
   }) => {
     const isActive = activeFolderId === option.id;
     const rawCount = folderCounts.get(option.countKey) ?? 0;
-    const displayCount = rawCount > 99 ? "99+" : rawCount;
+    const displayCount = rawCount > 999 ? "999+" : rawCount;
     const isDropTarget = draggingConversationId !== null && dragOverFolderId === option.id;
     return (
       <div
@@ -292,38 +292,40 @@ export default function SidebarContent({
             : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/40"
         } ${isDropTarget ? "border-tertiary/60 bg-tertiary/5 dark:bg-tertiary/20" : ""}`}
       >
-        <div className="flex-1 flex items-center justify-between text-left select-none pointer-events-none min-w-0">
-          <span className="truncate" title={option.label}>
+        <div className="flex-1 flex items-center justify-between text-left min-w-0">
+          <span className="truncate select-none pointer-events-none" title={option.label}>
             {option.label}
           </span>
-          <span className="ml-2 text-[11px] font-semibold text-gray-500 dark:text-gray-200">
-            {displayCount}
-          </span>
-        </div>
-        {option.canEdit && option.folder && (
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRenameFolder(option.folder);
-              }}
-              className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-            >
-              <Edit className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteFolder(option.folder);
-              }}
-              className="p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
+          <div className="flex items-center justify-between text-left min-w-0">
+            {option.canEdit && option.folder && (
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRenameFolder(option.folder);
+                  }}
+                  className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+                >
+                  <Edit className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteFolder(option.folder);
+                  }}
+                  className="p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+            <span className="ml-2 text-[11px] select-none pointer-events-none font-semibold text-gray-500 dark:text-gray-200">
+              {displayCount}
+            </span>
           </div>
-        )}
+        </div>
       </div>
     );
   };
@@ -342,6 +344,7 @@ export default function SidebarContent({
       activeFolderId === ALL_FOLDERS
         ? null
         : activeFolderId;
+    console.log("Creating new conversation in folder: ", activeFolderId);
     handleNewConversation(targetFolder)
       .then(() => {
         if (conversations[0]?.id) {
@@ -478,9 +481,13 @@ export default function SidebarContent({
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="sticky top-0 z-20 bg-white dark:bg-bg_secondary_dark shadow-[0_2px_6px_rgba(15,23,42,0.08)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.5)]">
           <div className="px-3 pt-3 pb-3 border-b border-gray-100 dark:border-gray-800 space-y-3">
+            <div className="flex gap-1">
             <button
               onClick={onNewConversation}
-              className={`cursor-pointer w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 text-black dark:text-white px-4 py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-medium touch-manipulation transition-colors`}
+              className={`cursor-pointer w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700
+                active:bg-gray-200 dark:active:bg-gray-600 text-black dark:text-white 
+                pl-3 pr-4 py-3 rounded-2xl flex items-center justify-center gap-2 text-xs 
+                font-medium touch-manipulation transition-colors`}
               style={{
                 WebkitTapHighlightColor: "transparent",
                 minHeight: "44px",
@@ -490,23 +497,32 @@ export default function SidebarContent({
               <span className="truncate">
                 <Trans i18nKey="sidebar.new_conversation" />
               </span>
+              
             </button>
-
-            <div className="relative">
-              {!searchVisible && (
+            {(
                 <button
                   type="button"
                   onClick={openSearch}
-                  className="group w-full flex items-center gap-2 rounded-xl px-2 py-2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition cursor-pointer"
+                  className={`group flex items-center rounded-xl text-xs
+                  text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200
+                  hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-[max-width,max-height,padding,opacity,transform]
+                  duration-300 cursor-pointer
+                  ${!searchVisible
+                    ? "max-w-14 max-h-14 px-2 py-2 opacity-100 gap-2 translate-y-0"
+                    : "max-w-0 max-w-0 px-0 py-0 opacity-0 -translate-y-1 pointer-events-none"}
+                  `}
                   aria-label={t("folders.search_label")}
                 >
                   <Search className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
-                  <span className="flex-1 text-left truncate">
+                  {/* <span className="flex-1 text-left truncate">
                     {t("folders.search_action")}
-                  </span>
+                  </span> */}
                 </button>
               )}
-
+              </div>
+<div className="relative">
+            
+              
               <div
                 className={`overflow-hidden transform-gpu transition-[max-height,opacity,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                   searchVisible
@@ -566,8 +582,8 @@ export default function SidebarContent({
           className="flex-1 overflow-y-auto overflow-x-hidden"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
-          <div className="px-3 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800 space-y-1 bg-white dark:bg-bg_secondary_dark">
-            <div className="flex items-center justify-between pb-2">
+          <div className="pl-3 pr-2 pt-3 pb-1 border-b border-gray-100 dark:border-gray-800 space-y-1 bg-white dark:bg-bg_secondary_dark">
+            <div className="flex items-center justify-between">
               <button
                 type="button"
                 onClick={() => setFoldersExpanded((v) => !v)}
@@ -626,7 +642,7 @@ export default function SidebarContent({
                   : folderMap.get(activeFolderId) || t("folders.uncategorized")}
               </span>
               <span className="ml-2 shrink-0 text-[11px] font-semibold text-gray-500 dark:text-gray-200">
-                {(visibleConversations.length ?? 0) > 99 ? "99+" : visibleConversations.length}
+                {(visibleConversations.length ?? 0) > 999 ? "999+" : visibleConversations.length}
               </span>
             </div>
             {noSearchResults && (
