@@ -3,6 +3,7 @@ import { useAttachments } from "../../hooks/useAttachments";
 import icon_file_uploaded from "../../assets/icons/file_uploaded.svg";
 import icon_cross from "../../assets/icons/cross.svg";
 import icon_mic from "../../assets/icons/mic.svg";
+import MiniAudioButton from "./MiniAudioButton";
 import icon_support_video from "../../assets/icons/support_video.svg";
 import { useEffect, useRef, useState } from "react";
 import { useModal } from "../../modals/ModalContext";
@@ -34,7 +35,8 @@ export default function Attachment({
   const { notifySuccess, notifyError } = useToast();
   const file = useFileMeta(attachment.fileId);
   const isImage = file?.type?.startsWith("image/");
-  const base64 = useFileBase64(isImage ? attachment.fileId : null);
+  const isAudio = file?.type?.startsWith("audio/");
+  const base64 = useFileBase64((isImage || isAudio) ? attachment.fileId : null);
   if (!file) return ""; // TODO placeholder file
   const fileType = getFileType(file); // Get readable file type, e.g., "image"
   const model = localState.settings.model;
@@ -142,13 +144,9 @@ export default function Attachment({
         borderColor: "border-blue-200 dark:border-blue-700/50",
         hoverColor:
           "hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800/30 dark:hover:to-blue-700/30",
-        iconBg: "bg-blue-500 dark:bg-blue-600",
+        iconBg: "bg-transparent",
         icon: (
-          <img
-            className="h-4 w-4 brightness-0 invert"
-            src={icon_mic}
-            alt={file.name}
-          />
+          <MiniAudioButton src={base64} />
         ),
       };
     } else if (file.type?.startsWith("image/")) {
@@ -162,7 +160,6 @@ export default function Attachment({
         icon: (
           <img
             className="h-full w-full object-cover rounded"
-            // I need to await this, is that possible?
             src={base64}
             alt={file.name}
           />
@@ -329,7 +326,7 @@ export default function Attachment({
         <div className="p-2 w-full h-full flex flex-col relative">
           <div className="flex items-center gap-2 flex-1 ">
             <div
-              className={`h-10 w-10 flex-shrink-0 flex items-center justify-center rounded ${displayInfo.iconBg} overflow-hidden`}
+              className={`h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full ${displayInfo.iconBg} overflow-hidden`}
             >
               {displayInfo.icon}
             </div>
