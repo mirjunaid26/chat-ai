@@ -480,7 +480,7 @@ export default function SidebarContent({
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="sticky top-0 z-20 bg-white dark:bg-bg_secondary_dark shadow-[0_2px_6px_rgba(15,23,42,0.08)] dark:shadow-[0_2px_6px_rgba(0,0,0,0.5)]">
-          <div className="px-3 pt-3 pb-3 border-b border-gray-100 dark:border-gray-800 space-y-3">
+          <div className="px-3 pt-3 border-b border-gray-100 dark:border-gray-800 space-y-3">
             <div className="flex gap-1">
             <button
               onClick={onNewConversation}
@@ -520,14 +520,12 @@ export default function SidebarContent({
                 </button>
               )}
               </div>
-<div className="relative">
-            
-              
+
               <div
-                className={`overflow-hidden transform-gpu transition-[max-height,opacity,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                className={`relative overflow-hidden transform-gpu transition-[max-height,opacity,transform,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                   searchVisible
-                    ? "max-h-14 opacity-100 translate-y-0"
-                    : "max-h-0 opacity-0 -translate-y-1 pointer-events-none"
+                    ? "max-h-14 opacity-100 pb-3 translate-y-0"
+                    : "max-h-0 opacity-0 pb-0 -translate-y-1 pointer-events-none"
                 }`}
               >
                 <div className="relative rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40  transition">
@@ -576,8 +574,6 @@ export default function SidebarContent({
               </div>
             </div>
           </div>
-        </div>
-
         <div
           className="flex-1 overflow-y-auto overflow-x-hidden"
           style={{ WebkitOverflowScrolling: "touch" }}
