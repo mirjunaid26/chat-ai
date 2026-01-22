@@ -52,6 +52,7 @@ export default {
     uncategorized: "Ohne Ordner",
     create_button: "Neuer Ordner",
     search_label: "Suche",
+    search_action: "Chats durchsuchen",
     search_placeholder: "nach Titel durchsuchen",
     search_no_results: 'Keine Treffer für "{{query}}"',
     clear_search: "Suche löschen",

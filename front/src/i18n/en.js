@@ -52,6 +52,7 @@ export default {
     uncategorized: "Unsorted",
     create_button: "New folder",
     search_label: "Search",
+    search_action: "Search chats",
     search_placeholder: "Search by title",
     search_no_results: 'No matches for "{{query}}"',
     clear_search: "Clear search",

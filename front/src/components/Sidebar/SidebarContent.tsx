@@ -6,13 +6,16 @@ import { useNavigate } from "react-router";
 
 import {
   ChevronLeft,
+  ChevronDown,
   Download,
   Edit,
   FolderInput,
   FolderPlus,
   MoreVertical,
+  Plus,
+  Search,
   Trash2,
-  Triangle,
+  X,
 } from "lucide-react";
 import { assignConversationToFolder, useConversationList, useFolderList } from "../../db";
 import { useModal } from "../../modals/ModalContext";
@@ -70,6 +73,21 @@ export default function SidebarContent({
   const [searchQuery, setSearchQuery] = useState("");
   const normalizedSearch = searchQuery.trim().toLowerCase();
   const hasSearch = normalizedSearch.length > 0;
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const searchVisible = searchOpen || hasSearch;
+
+  const openSearch = useCallback(() => {
+    setSearchOpen(true);
+    requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+    });
+  }, []);
+
+  const closeSearch = useCallback(() => {
+    setSearchQuery("");
+    setSearchOpen(false);
+  }, []);
 
   useEffect(() => {
     if (activeFolderId === ALL_FOLDERS) {
@@ -468,50 +486,77 @@ export default function SidebarContent({
                 minHeight: "44px",
               }}
             >
-              <svg
-                className="h-4 w-4 flex-shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
+              <Plus className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">
                 <Trans i18nKey="sidebar.new_conversation" />
               </span>
             </button>
 
-            <div className="flex flex-col gap-1">
-              {/* <label className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                <Trans i18nKey="folders.search_label" />
-              </label> */}
-              <div className="relative">
-                <input
-                  type="text"
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="none"
-                  spellCheck={false}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t("folders.search_placeholder")}
-                  className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 px-3 py-2 text-xs text-black dark:text-white pr-7 focus:outline-none focus:ring-2 focus:ring-tertiary/40"
-                />
-                {searchQuery.length > 0 && (
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-                    aria-label={t("folders.clear_search")}
-                    onClick={() => setSearchQuery("")}
-                  >
-                    ×
-                  </button>
-                )}
+            <div className="relative">
+              {!searchVisible && (
+                <button
+                  type="button"
+                  onClick={openSearch}
+                  className="group w-full flex items-center gap-2 rounded-xl px-2 py-2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition cursor-pointer"
+                  aria-label={t("folders.search_label")}
+                >
+                  <Search className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
+                  <span className="flex-1 text-left truncate">
+                    {t("folders.search_action")}
+                  </span>
+                </button>
+              )}
+
+              <div
+                className={`overflow-hidden transform-gpu transition-[max-height,opacity,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                  searchVisible
+                    ? "max-h-14 opacity-100 translate-y-0"
+                    : "max-h-0 opacity-0 -translate-y-1 pointer-events-none"
+                }`}
+              >
+                <div className="relative rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40  transition">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key !== "Escape") return;
+                      e.preventDefault();
+                      if (hasSearch) {
+                        setSearchQuery("");
+                      } else {
+                        setSearchOpen(false);
+                      }
+                    }}
+                    placeholder={t("folders.search_placeholder")}
+                    className="w-full bg-transparent pl-9 pr-9 py-2 text-xs text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none"
+                  />
+                  {searchQuery.length > 0 ? (
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                      aria-label={t("folders.clear_search")}
+                      onClick={() => setSearchQuery("")}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                      aria-label={t("common.cancel")}
+                      onClick={closeSearch}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -522,39 +567,30 @@ export default function SidebarContent({
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           <div className="px-3 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800 space-y-1 bg-white dark:bg-bg_secondary_dark">
-            {/* Header (clickable) */}
-            <button
-              type="button"
-              onClick={() => setFoldersExpanded((v) => !v)}
-              className="w-full flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400"
-            >
-              <div className="justify-start flex items-center gap-2" >
-                <span>{t("folders.title")}</span>
-              <Triangle
-                className={`transition-transform duration-200 h-[9px] w-[9px] ${
-                  foldersExpanded ? "rotate-180" : "rotate-90"
-                }`}
-              >
-                ▾
-              </Triangle>
-              
-              </div>
-            {/* Chevron */}
-              
-            <div className="flex items-center gap-1">
+            <div className="flex items-center justify-between pb-2">
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation(); // prevent collapsing when clicking +
-                  handleCreateFolder();
-                }}
+                onClick={() => setFoldersExpanded((v) => !v)}
+                className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition cursor-pointer"
+                aria-expanded={foldersExpanded}
+              >
+                <span>{t("folders.title")}</span>
+                <ChevronDown
+                  className={`transition-transform duration-200 h-3 w-3 ${
+                    foldersExpanded ? "rotate-0" : "-rotate-90"
+                  }`}
+                />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCreateFolder}
                 className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition"
                 aria-label={t("folders.create_button")}
               >
                 <FolderPlus className="w-4 h-4" />
               </button>
             </div>
-            </button>
             <div
               className={`
                 overflow-hidden
@@ -582,7 +618,17 @@ export default function SidebarContent({
           </div>
 
           {/* Conversations List */}
-          <div className="mx-3 pt-0 space-y-1 pb-6">
+          <div className="mx-3 pt-3 space-y-1 pb-6">
+            <div className="flex items-center justify-between pb-2 text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <span className="truncate">
+                {activeFolderId === ALL_FOLDERS
+                  ? t("folders.all")
+                  : folderMap.get(activeFolderId) || t("folders.uncategorized")}
+              </span>
+              <span className="ml-2 shrink-0 text-[11px] font-semibold text-gray-500 dark:text-gray-200">
+                {(visibleConversations.length ?? 0) > 99 ? "99+" : visibleConversations.length}
+              </span>
+            </div>
             {noSearchResults && (
               <div className="text-center text-xs text-gray-500 dark:text-gray-400 py-4">
                 <Trans i18nKey="folders.search_no_results" values={{ query: searchQuery }} />
@@ -660,7 +706,7 @@ export default function SidebarContent({
 
         {/* Bottom section */}
         <div className="sticky bottom-0 bg-white dark:bg-bg_secondary_dark pt-3 pb-4 shadow-[0_-2px_6px_rgba(15,23,42,0.08)] dark:shadow-[0_-2px_6px_rgba(0,0,0,0.5)]">
-          <div className="flex flex-col gap-3 mx-3 border-t border-gray-200 dark:border-gray-500 pt-3">
+          <div className="flex flex-col gap-3 mx-3">
             <ImportConversationButton variant="button" />
             <button
               onClick={() => {
