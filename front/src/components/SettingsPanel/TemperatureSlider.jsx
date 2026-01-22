@@ -68,7 +68,7 @@ export default function TemperatureSlider({ localState, setLocalState }) {
           <span>Creative</span>
         </div>
 
-        <div className="relative w-full h-6 flex items-center">
+        <div className="relative w-full h-4 flex items-center">
           <div className="w-full h-1 bg-gray-300 dark:bg-gray-600 rounded-full">
             <div
               className="h-full bg-tertiary rounded-full"

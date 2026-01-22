@@ -1,4 +1,4 @@
-import { Shrink } from "lucide-react";
+import { MessageSquareText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSendMessage } from "../../hooks/useSendMessage";
 import Tooltip from "../Others/Tooltip";
@@ -44,11 +44,11 @@ export default function SummaryButton({
   return (
     <Tooltip text={t("common.summarize")}>
       <button
-        className="h-[26px] w-[26px] cursor-pointer"
+        className="h-[24px] w-[24px] cursor-pointer"
         onClick={handleClick}
         disabled={loading}
       >
-        <Shrink className="cursor-pointer h-[26px] w-[26px] text-[#009EE0] hover:text-blue-600 transition-colors" />
+        <MessageSquareText className="cursor-pointer h-[24px] w-[24px] text-[#009EE0] hover:text-red-500 transition-colors" />
       </button>
     </Tooltip>
   );

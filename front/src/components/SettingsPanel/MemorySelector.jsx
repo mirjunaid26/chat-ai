@@ -15,7 +15,7 @@ export default function MemorySelector({ localState, setLocalState }) {
         />
       </div>
       <div className="w-full">
-        <div className="flex bg-white dark:bg-bg_secondary_dark border dark:border-border_dark rounded-xl shadow-lg dark:shadow-dark overflow-hidden">
+        <div className="flex bg-white dark:bg-bg_secondary_dark border dark:border-border_dark rounded-xl shadow-sm dark:shadow-dark overflow-hidden">
           {/* None Option */}
           <div
             className={`memory-option-off flex-1 p-2 text-center cursor-pointer transition-all duration-200 select-none ${

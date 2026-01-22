@@ -2,13 +2,14 @@
 
 ## Version: v0.9.2 (22.01.2026)
 Highlights:
-- Folders and search for organizing and finding conversations
-- "Suggest user prompts" option provides selection of follow-up messages with each model response
-- New button to "summarize conversation and replace"
+- Added folders and search for organizing and finding conversations
+- "Suggest user prompts" option to provide follow-up message suggestions
+- New "summarize conversation and replace" button
 - Developer can individually enable/disable UI modules, including "tools", "memory", "suggest prompts"
 - Fixed and improved several tools, including arcana, web_search, and audio_generation
 - Improved audio generation model
 - Basic support for audio input and transcription via tools using whisper
+- Possible to select and copy UI text in multiple areas
 - Bug fixes
 
 ## Version: v0.9.1 (15.12.2025)
