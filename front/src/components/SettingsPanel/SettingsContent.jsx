@@ -432,6 +432,16 @@ const SettingsPanel = ({ localState, setLocalState, userData, modelsData }) => {
               setLocalState={setLocalState}
             />
           )}
+          {/* Suggestions Toggle */}
+          {choicesModule && <ChoiceProposer
+            localState={localState}
+            setLocalState={setLocalState}
+          />}
+          {/* Memory Selector */}
+          <MemorySelector
+            localState={localState}
+            setLocalState={setLocalState}
+          />
           {/* temperature Slider */}
           <TemperatureSlider
             localState={localState}
@@ -439,15 +449,6 @@ const SettingsPanel = ({ localState, setLocalState, userData, modelsData }) => {
           />
           {/* top_p Slider */}
           <TopPSlider localState={localState} setLocalState={setLocalState} />
-          {/* Memory Selector */}
-          <MemorySelector
-            localState={localState}
-            setLocalState={setLocalState}
-          />
-          {choicesModule && <ChoiceProposer
-            localState={localState}
-            setLocalState={setLocalState}
-          />}
           {/* System Prompt */}
           <SystemPromptContainer
             localState={localState}

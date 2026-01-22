@@ -44,7 +44,7 @@ const NotFoundPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full overflow-hidden bg-white dark:bg-black text-black dark:text-white select-none">
+    <div className="flex flex-col items-center justify-center h-full overflow-hidden bg-white dark:bg-black text-black dark:text-white">
       <div className="text-center max-w-2xl px-4">
         <p className="text-5xl font-bold mb-6">
           <Trans i18nKey="not_found.title" />

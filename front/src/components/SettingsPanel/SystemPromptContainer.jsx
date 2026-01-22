@@ -61,8 +61,8 @@ export default function SystemPromptContainer({ localState, setLocalState }) {
 
   return (
     <div className="w-full flex flex-col flex-grow gap-4">
-      <div className="flex-shrink-0 flex items-center gap-2 select-none">
-        <p className="text-sm">System prompt</p>
+      <div className="flex-shrink-0 flex items-center gap-2">
+        <p className="text-sm font-medium">System prompt</p>
         <HelpCircle
           className="h-[16px] w-[16px] cursor-pointer text-[#009EE0]"
           alt="help"

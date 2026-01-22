@@ -145,7 +145,7 @@ export default function ToolsContainer({ localState, setLocalState }) {
     <div className="w-full space-y-3">
       {/* Header */}
       <div className="flex flex-row md:gap-4 gap-3 w-full md:items-center">
-        <div className="flex-shrink-0 flex items-center gap-2 select-none">
+        <div className="flex-shrink-0 flex items-center gap-2">
           <p className="text-sm font-medium">{t("settings.tools_title")}</p>
           <HelpCircle
             className="h-[16px] w-[16px] cursor-pointer text-gray-500 dark:text-gray-400"
@@ -198,7 +198,7 @@ export default function ToolsContainer({ localState, setLocalState }) {
       <div
         className={[
           "grid gap-2.5 sm:gap-3",
-          "grid-cols-[repeat(auto-fill,minmax(7.25rem,1fr))]",
+          "grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))]",
         ].join(" ")}
       >
         {TOOL_DEFS.map(({ key, Icon, label }) => {

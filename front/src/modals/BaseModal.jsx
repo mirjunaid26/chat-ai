@@ -58,7 +58,7 @@ export default function BaseModal({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
-                className={`select-none rounded-2xl bg-white dark:bg-bg_dark w-full ${maxWidth} shadow-lg`}
+                className={`rounded-2xl bg-white dark:bg-bg_dark w-full ${maxWidth} shadow-lg`}
               >
                 {/* Header */}
                 <div className="flex justify-between items-center p-5 pb-3">
